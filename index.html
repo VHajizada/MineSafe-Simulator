@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MineSafe Simulator — Təhlükəsiz qərar verməyi oyunla öyrən</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08141f;--bg2:#0f2233;--line:#22394d;--tx:#eaf1f6;--mu:#8fa5b6;--amb:#ffb81c;--grn:#4ade80;--red:#ff5a4d;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6}
+h1,h2,h3{font-family:'Bricolage Grotesque',Manrope,sans-serif;letter-spacing:-.02em;line-height:1.1}
+.tape{height:10px;background:repeating-linear-gradient(-45deg,var(--amb) 0 14px,#111 14px 28px)}
+nav{position:sticky;top:0;z-index:50;background:#08141fee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{max-width:1180px;margin:auto;padding:10px 18px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.logo{font:800 1.15rem 'Bricolage Grotesque';cursor:pointer}.logo b{color:var(--amb)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{background:none;border:0;color:var(--mu);font:600 .86rem Manrope;padding:8px 12px;border-radius:10px;cursor:pointer}
+.tabs button:hover,.tabs button.on{color:var(--tx);background:var(--bg2)}
+.tabs button.on{box-shadow:inset 0 -2px var(--amb)}
+main{max-width:1180px;margin:auto;padding:28px 18px 70px}
+.pg{display:none}.pg.on{display:block}
+.btn{border:0;border-radius:12px;padding:13px 22px;font:800 .95rem Manrope;cursor:pointer;transition:.15s}
+.btn:hover{transform:translateY(-2px)}.btn:focus-visible,.ch:focus-visible{outline:3px solid #fff}
+.b1{background:var(--amb);color:#1a1200}.b2{background:var(--bg2);color:var(--tx);border:1px solid var(--line)}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:34px 0}
+.hero h1{font-size:clamp(2.2rem,5vw,3.8rem)}
+.hero p{color:var(--mu);margin:16px 0 24px;max-width:540px}
+.hero svg{width:100%;border-radius:22px;border:1px solid var(--line)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:22px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.card h3{font-size:1.1rem;margin-bottom:8px}.card p{color:var(--mu);font-size:.92rem}
+.card .big{font:800 2.3rem 'Bricolage Grotesque';color:var(--amb)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chips span{font-size:.78rem;font-weight:700;padding:5px 11px;border-radius:99px;background:#16324a;color:#bcd6e8}
+.sec{margin:42px 0 6px;font-size:1.7rem}
+/* GAME */
+.gw{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;touch-action:none}
+canvas{display:block;width:100%;height:auto}
+.hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;gap:10px;padding:12px 16px;font-weight:800;pointer-events:none;flex-wrap:wrap}
+.hud>div{background:#08141fcc;border-radius:12px;padding:7px 13px;font-size:.9rem}
+.dots i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#33495b;margin-left:5px}
+.dots i.d{background:var(--grn)}.dots i.x{background:var(--red)}
+.alert{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:var(--red);color:#fff;font-weight:800;padding:8px 18px;border-radius:99px;display:none;animation:bl .7s infinite}
+@keyframes bl{50%{opacity:.45}}
+.ov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#04101ccc;padding:16px;overflow:auto}
+.ov.on{display:flex}
+.pn{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:640px;width:100%}
+.pn h2{font-size:1.5rem;margin:6px 0 8px}.pn p{color:var(--mu)}
+.zone{font-size:.8rem;font-weight:800;color:var(--amb)}
+.tm{height:7px;background:#17303f;border-radius:9px;margin:14px 0;overflow:hidden}.tm i{display:block;height:100%;background:var(--amb);width:100%}
+.ch{display:block;width:100%;text-align:left;margin-top:9px;padding:13px 16px;border-radius:12px;border:1.5px solid var(--line);background:#0b1b29;color:var(--tx);font:600 .93rem Manrope;cursor:pointer}
+.ch:hover{border-color:var(--amb);background:#14293a}
+.res{margin-top:14px;padding:14px 16px;border-radius:12px;font-size:.92rem}
+.res.ok{background:#12351f;border:1px solid var(--grn)}.res.no{background:#3a1613;border:1px solid var(--red)}
+.mob{display:none;position:absolute;right:14px;bottom:14px}
+.mob button{width:84px;height:84px;border-radius:50%;border:0;background:var(--amb);font:800 1rem Manrope;box-shadow:0 8px 24px #0008}
+@media(hover:none){.mob{display:block}}
+@media(max-width:820px){.hero{grid-template-columns:1fr}}
+.stars{font-size:2.4rem;letter-spacing:6px;color:var(--amb)}
+.stat{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0;font-weight:800}
+/* misc */
+.chat{height:320px;overflow:auto;background:#0b1b29;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.bb{padding:10px 14px;border-radius:14px;margin-bottom:10px;max-width:84%;white-space:pre-line;font-size:.92rem}
+.bb.u{background:var(--amb);color:#1a1200;margin-left:auto}.bb.b{background:var(--bg2);border:1px solid var(--line)}
+input{padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:#0b1b29;color:var(--tx);font:600 .93rem Manrope;flex:1;min-width:200px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:.9rem}
+.cert{position:relative;margin-top:22px;border-radius:20px;padding:10px;background:linear-gradient(135deg,#f6d77a,#b8862b 35%,#f9e7a3 55%,#a8761f);box-shadow:0 30px 70px #0009;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ci{position:relative;overflow:hidden;border-radius:12px;background:radial-gradient(circle at 50% 0,#fffdf6,#f1ead6 75%);color:#10202e;text-align:center;padding:0 28px 32px;border:2px solid #0c1b29;outline:1px solid #b8862b;outline-offset:-10px}
+.ci::before{content:"M";position:absolute;inset:0;display:grid;place-items:center;font:800 26rem 'Bricolage Grotesque';color:#0c1b29;opacity:.04;pointer-events:none}
+.cband{height:16px;margin:0 -28px 22px;background:repeating-linear-gradient(-45deg,#ffb81c 0 14px,#111 14px 28px)}
+.ck{font-weight:800;letter-spacing:.18em;font-size:.78rem;color:#6b5420}
+.cert h2{font-size:clamp(2rem,5vw,3.3rem);margin:8px 0 2px;color:#0c1b29}
+.sub{color:#5b6b78;font-size:.95rem;margin-bottom:18px}
+.cert .nm{font:800 clamp(1.8rem,4.5vw,3rem) 'Bricolage Grotesque';background:linear-gradient(90deg,#9a6c18,#e8b83c,#9a6c18);-webkit-background-clip:text;background-clip:text;color:transparent;border-bottom:2px solid #b8862b;padding:0 30px;margin:10px 0 14px;display:inline-block}
+.cbody{max-width:620px;margin:0 auto}
+.cf{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-top:26px;flex-wrap:wrap;font-size:.8rem;color:#4a5a67;text-align:left}
+.cf div{min-width:140px}.cf b{display:block;color:#10202e;font-size:.95rem;border-top:1.5px solid #10202e;padding-top:5px;margin-top:4px}
+.seal{width:112px;height:112px;filter:drop-shadow(0 6px 8px #0005)}
+body{background:radial-gradient(900px 500px at 85% -5%,#1d4a5c66,transparent),radial-gradient(700px 500px at 0 25%,#3a2a0a44,transparent),var(--bg);background-attachment:fixed}
+.hero h1{background:linear-gradient(180deg,#fff,#a9c3d6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero svg{box-shadow:0 30px 80px #000a}
+.card{background:linear-gradient(160deg,#133048,#0c1d2c);transition:.25s}.card:hover{border-color:#ffb81c77;transform:translateY(-4px);box-shadow:0 18px 40px #0007}
+.b1{box-shadow:0 8px 26px #ffb81c44}.b1:hover{box-shadow:0 12px 34px #ffb81c88}
+.gw{box-shadow:0 30px 80px #000b}
+.pn{backdrop-filter:blur(14px);background:#0f2233ee;box-shadow:0 30px 70px #000a}
+.hud>div{backdrop-filter:blur(8px);border:1px solid #ffffff1c}
+.pg.on{animation:fi .4s}@keyframes fi{from{opacity:0;transform:translateY(8px)}}
+@page{size:landscape;margin:8mm}
+@media print{nav,.tape,.noprint{display:none!important}body{background:#fff}.pg{display:none!important}#cert{display:block!important}.cert{box-shadow:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="tape"></div>
+<nav><div class="nav">
+<div class="logo" onclick="go('home')">Mine<b>Safe</b> Simulator</div>
+<div class="tabs" id="tabs">
+<button data-p="home" class="on">Ana səhifə</button><button data-p="game">Oyun</button><button data-p="learn">Öyrən</button><button data-p="ai">AI köməkçi</button><button data-p="cert">Sertifikat</button>
+</div></div></nav>
+
+<main>
+<section id="home" class="pg on">
+<div class="hero">
+<div>
+<h1>Bir düzgün qərar həyatı xilas edir.</h1>
+<p>Kəndin içindən keç, təhlükəli əşyalarla qarşılaş və saniyələr içində qərar ver. Real mina yoxdur — amma real vərdiş formalaşır: <b style="color:var(--tx)">dayan, toxunma, uzaqlaş, məlumat ver.</b></p>
+<div class="row"><button class="btn b1" onclick="go('game')">Oyuna başla</button><button class="btn b2" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'})">Layihə haqqında</button></div>
+</div>
+<svg viewBox="0 0 480 300" aria-label="Kənd mənzərəsi"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb06a"/><stop offset="1" stop-color="#4b6f9c"/></linearGradient></defs>
+<rect width="480" height="300" fill="url(#g)"/><circle cx="360" cy="90" r="34" fill="#ffe9a8"/>
+<path d="M0 200Q120 130 240 190T480 170V300H0Z" fill="#2c5a46"/><path d="M0 235Q160 190 480 230V300H0Z" fill="#1d4333"/>
+<rect x="70" y="170" width="60" height="42" fill="#d8c9a8"/><path d="M62 172l38-30 38 30z" fill="#a14b3a"/>
+<path d="M0 262h480" stroke="#7a5b3a" stroke-width="22"/>
+<g transform="translate(330 232)"><path d="M0 24 18-10 36 24z" fill="#ffb81c" stroke="#111" stroke-width="3"/><text x="14" y="20" font-size="16" font-weight="800">!</text><rect x="16" y="24" width="4" height="26" fill="#444"/></g>
+<rect width="480" height="8" y="292" fill="#ffb81c"/></svg>
+</div>
+<h2 class="sec" id="why">Niyə bu layihə?</h2>
+<div class="grid">
+<div class="card"><div class="big">Problem</div><h3>Qəfil qarşılaşma anı</h3><p>Mina və partlamamış sursat təhlükəsi olan ərazilərdə uşaqlar və sakinlər ən çox maraq və ya bilməməzlik üzündən risk edir. Oxumaq tez unudulur.</p></div>
+<div class="card"><div class="big">Həll</div><h3>Qərarı təcrübə ilə öyrət</h3><p>5 real həyat missiyası, vaxt təzyiqi, canlar və kombo sistemi: istifadəçi düzgün davranışı oynayaraq “əzbərləyir”.</p></div>
+<div class="card"><div class="big">Təsir</div><h3>Məktəb, ailə, icma</h3><p>Brauzerdə işləyir, quraşdırma tələb etmir, telefonda da oynanır. Nəticə sertifikatla təsdiqlənir.</p></div>
+</div>
+<div class="grid"><div class="card" style="border-left:4px solid var(--amb)"><h3>Etik qeyd</h3><p>Platforma real mina aşkarlama aləti deyil, real koordinatlardan istifadə etmir və yoxlama, toxunma və ya zərərsizləşdirmə təlimatı vermir. Yeganə təhlükəsiz yol: dayan, toxunma, uzaqlaş, 102 / 112 / 805 xəttinə zəng et.</p>
+<div class="chips"><span>HTML5 Canvas oyun mühərriki</span><span>Python Flask</span><span>Groq AI köməkçisi</span><span>Fərdi AI tövsiyə</span><span>Mobil uyğun</span><span>Web Audio səsləri</span></div></div></div>
+</section>
+
+<section id="game" class="pg">
+<h2 style="font-size:1.8rem;margin-bottom:6px">Kənd missiyası</h2>
+<p style="color:var(--mu);margin-bottom:16px">Qəhrəmanı <b>→</b> / <b>D</b> düyməsi ilə (mobildə sağdakı düymə ilə) irəli apar. Hər təhlükə nöqtəsində 15 saniyən var.</p>
+<div class="gw" id="gw">
+<canvas id="cv" width="960" height="460"></canvas>
+<div class="hud"><div id="hLives">❤️❤️❤️</div><div class="dots" id="hDots"></div><div id="hScore">0 xal · kombo x0</div></div>
+<div class="alert" id="alert">⚠ TƏHLÜKƏ SİQNALI — DAYAN!</div>
+<div class="mob"><button id="mb">İRƏLİ</button></div>
+<div class="ov on" id="ovStart"><div class="pn"><div class="zone">MİSSİYA</div><h2>Kəndə gedən yol</h2><p>5 təhlükə nöqtəsi səni gözləyir. Düzgün qərar xal və kombo qazandırır, təhlükəli seçim can aparır. Üç can itirsən, missiya başa çatır.</p><button class="btn b1" style="margin-top:16px" onclick="startGame()">Yola düş</button></div></div>
+<div class="ov" id="ovDec"><div class="pn"><div class="zone" id="dZone"></div><h2 id="dT"></h2><p id="dD"></p><div class="tm"><i id="dBar"></i></div><div id="dCh"></div><div id="dRes"></div></div></div>
+<div class="ov" id="ovEnd"><div class="pn" id="endBox"></div></div>
+</div>
+</section>
+
+<section id="learn" class="pg">
+<h2 style="font-size:1.8rem">Maarifləndirmə mərkəzi</h2>
+<div class="grid" id="topics"></div>
+</section>
+
+<section id="ai" class="pg">
+<h2 style="font-size:1.8rem;margin-bottom:14px">AI köməkçi</h2>
+<div class="card"><div class="chat" id="chat"><div class="bb b">Salam! Mina təhlükəsizliyi, xəbərdarlıq nişanları və şübhəli əşya ilə qarşılaşdıqda təhlükəsiz addımlar barədə sual verə bilərsən.</div></div>
+<div class="row"><input id="ci" placeholder="Sualını yaz..." onkeydown="if(event.key==='Enter')sendChat()"><button class="btn b1" onclick="sendChat()">Göndər</button></div></div>
+</section>
+
+<section id="cert" class="pg">
+<h2 style="font-size:1.8rem;margin-bottom:14px">Nəticələr və sertifikat</h2>
+<div class="card noprint"><table><thead><tr><th>İştirakçı</th><th>Rütbə</th><th>Xal</th></tr></thead><tbody id="lb"></tbody></table>
+<div class="row" style="margin-top:16px"><input id="nm" placeholder="Ad və soyad"><button class="btn b1" onclick="mkCert()">Sertifikat yarat</button><button class="btn b2" onclick="print()">Çap et / PDF</button></div></div>
+<div class="cert"><div class="ci"><div class="cband"></div>
+<div class="ck">MINESAFE SIMULATOR · AZƏRBAYCAN</div>
+<svg class="seal" viewBox="0 0 120 120"><defs><radialGradient id="sg"><stop offset="0" stop-color="#fff2b0"/><stop offset=".6" stop-color="#e8b83c"/><stop offset="1" stop-color="#9a6c18"/></radialGradient></defs><path d="M38 80l-12 36 22-10 12 12 8-34zM82 80l12 36-22-10-12 12-8-34z" fill="#c0392b"/><circle cx="60" cy="52" r="46" fill="url(#sg)" stroke="#8a5d12" stroke-width="3"/><circle cx="60" cy="52" r="36" fill="none" stroke="#8a5d12" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M60 24l8 17 19 2-14 13 4 19-17-9-17 9 4-19-14-13 19-2z" fill="#0c1b29"/></svg>
+<h2>İştirak Sertifikatı</h2><div class="sub">Mina təhlükəsizliyi üzrə maarifləndirmə proqramı</div>
+<p>Bu sənəd təsdiq edir ki,</p><div class="nm" id="cN">İştirakçı</div>
+<p class="cbody">interaktiv mina təhlükəsizliyi missiyasını tamamlamış, <b id="cS">0</b> xal toplamış və <b id="cR">Başlanğıc</b> rütbəsinə layiq görülmüşdür. “Dayan, toxunma, uzaqlaş, məlumat ver” qaydası öyrənilmişdir.</p>
+<div class="cf"><div>Tarix<b id="cD">—</b></div><div style="text-align:center">Təcili xətlər<b>102 · 112 · 805</b></div><div style="text-align:right">Sertifikat №<b id="cI">MS-00000</b></div></div>
+<p style="margin-top:16px;font-size:.74rem;color:#6b7a86">Yalnız maarifləndirici simulyasiyadır. Real mina aşkarlama sistemi deyil.</p></div></div>
+</section>
+</main>
+
+<script>
+const API="",KEY="minesafe_v3";
+const L=[
+{z:"Açıq sahə",tp:"Şübhəli əşya",t:"Otların arasında naməlum metal əşya",d:"Kənd kənarında gedirsən. Qarşıda daha əvvəl görmədiyin metal bir əşya parıldayır.",c:[["Yaxınlaşıb diqqətlə baxmaq",0,"Yaxınlaşmaq belə risk yaradır."],["Əşyaya toxunmaq və ya tərpətmək",0,"Toxunuş və ya hərəkət partlayışa səbəb ola bilər."],["Dayanmaq, toxunmamaq, geri çəkilmək və 102/112/805-ə zəng etmək",1,"Düzgün! Məsafə və rəsmi məlumat həyatı qoruyur."]]},
+{z:"Əkin sahəsi",tp:"Xəbərdarlıq nişanları",t:"Sahənin kənarında rəsmi təhlükə nişanı",d:"Nişanın arxası sakit və təhlükəsiz görünür, amma lent çəkilib.",c:[["Sahə sakit olduğu üçün qısa yolla keçmək",0,"Təhlükənin görünməməsi onun olmaması demək deyil."],["Girməmək, yaxındakıları xəbərdar etmək və qurumlara bildirmək",1,"Düzgün! Nişan rəsmi qadağadır."],["Yalnız lentin altından əyilib keçmək",0,"Qadağan zonaya daxil olmaq birbaşa risqdir."]]},
+{z:"Meşə zolağı",tp:"Partlamamış sursat",t:"Torpaqdan qismən çıxmış köhnə sursat qalığı",d:"Yağışdan sonra ağacların altında paslı silindrik bir cisim görünür.",c:[["Torpağı təmizləyib nə olduğuna baxmaq",0,"Partlamamış sursat toxunuşa həssas ola bilər."],["Yerində dayanmaq, ehtiyatla geri çəkilmək və məlumat vermək",1,"Düzgün! Heç vaxt yoxlama."],["Dostları çağırıb birlikdə baxmaq",0,"Toplanmaq risk altında olanların sayını artırır."]]},
+{z:"Kənd cığırı",tp:"Təhlükəsiz hərəkət",t:"İstifadəsiz cığır və tərk edilmiş tikili",d:"Əsas yoldan ayrılan cığır tərk edilmiş binaya aparır. Qısa yol kimi görünür.",c:[["Tikilinin içinə maraqdan girmək",0,"Nəzarətsiz sahələr gizli təhlükə daşıyır."],["Əsas və tanış yolda qalmaq",1,"Düzgün! Yalnız bilinən yollardan istifadə et."],["Sıx otluğun içindən keçmək",0,"Baxımsız zolaqlar əlavə risk yaradır."]]},
+{z:"Kənd girişi",tp:"İcmanı qorumaq",t:"Dostun tapdığı əşyanı götürmək istəyir",d:"Dostun yoldan kənarda bir əşya tapıb. “Gəl götürək, maraqlıdır!” deyir.",c:[["Onunla bir yerdə götürüb yoxlamaq",0,"Birlikdə risk etmək təhlükəni artırır."],["Dostuna toxunmamağı deyib birgə uzaqlaşmaq və böyüyə xəbər vermək",1,"Düzgün! Başqasını qorumaq da qərardır."],["Sadəcə baxıb heç kimə deməmək",0,"Məlumat verilməsə, başqası zərər görə bilər."]]}];
+const TOPICS=[["Mina nədir?","Torpağın üstündə və ya altında yerləşdirilən, təsir nəticəsində partlayan qurğudur."],["Partlamamış sursat","Müharibə və ya təlimlərdən qalmış, vaxtında partlamamış mərmi, qumbara və digər sursatlardır."],["Niyə təhlükəlidir?","Uzun illər keçsə də partlama qabiliyyətini saxlaya bilər."],["Xəbərdarlıq nişanları","Nişan və lent olan əraziyə girmək qəti qadağandır."],["Şübhəli əşya","Dayan, yaxınlaşma, toxunma, gəldiyin yolla uzaqlaş, məlumat ver."],["Uşaqları qorumaq","Uşaqlara naməlum əşyaya toxunmamağı öyrət, təhlükəli ərazidə oynatma."],["Hara zəng etməli?","102 (DİN), 112 (FHN), 805 (ANAMA)."]];
+const SAMPLE=[["Aysel M.",500],["Murad Ə.",380],["Leyla H.",260]];
+const $=id=>document.getElementById(id);
+let st={best:0,name:""};try{st={...st,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const rank=c=>c>=5?"Təhlükəsizlik Eksperti":c>=3?"Tədqiqatçı":"Başlanğıc";
+function go(p){document.querySelectorAll(".pg").forEach(s=>s.classList.toggle("on",s.id===p));document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));scrollTo(0,0);if(p==="cert")sync()}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.p));
+$("topics").innerHTML=TOPICS.map((x,i)=>`<div class="card"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join("");
+/* audio */
+let ac;function snd(f,d=.15,tp="sine"){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type=tp;o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.stop(ac.currentTime+d)}catch(e){}}
+/* game */
+const cv=$("cv"),x=cv.getContext("2d"),W=960,H=460,GY=350,GAP=1000,END=L.length*GAP+700;
+let G={s:"idle",px:80,ph:0,lives:3,score:0,combo:0,res:[],i:0,hold:false,t:0,shake:0,flash:0,lane:0,cleared:{},last:0};
+const hz=i=>800+i*GAP;
+function startGame(){G={...G,s:"walk",px:80,lives:3,score:0,combo:0,res:[],i:0,cleared:{},lane:0,flash:0};$("ovStart").classList.remove("on");$("ovEnd").classList.remove("on");hud();snd(520)}
+function hud(){$("hLives").textContent="❤️".repeat(G.lives)+"🖤".repeat(3-G.lives);$("hScore").textContent=`${G.score} xal · kombo x${G.combo}`;$("hDots").innerHTML=L.map((_,i)=>`<i class="${G.res[i]===1?"d":G.res[i]===0?"x":""}"></i>`).join("")}
+addEventListener("keydown",e=>{if(["ArrowRight","d","D"].includes(e.key)){G.hold=true;if(e.key==="ArrowRight"&&$("game").classList.contains("on"))e.preventDefault()}});
+addEventListener("keyup",e=>{if(["ArrowRight","d","D"].includes(e.key))G.hold=false});
+["pointerdown","pointerup","pointerleave"].forEach(ev=>$("mb").addEventListener(ev,e=>{G.hold=ev==="pointerdown"}));
+let dec=null,tmr=null;
+function openDec(){const q=L[G.i];G.s="decide";$("alert").style.display="none";snd(220,.3,"square");
+$("dZone").textContent=`${q.z} · ${q.tp}`;$("dT").textContent=q.t;$("dD").textContent=q.d;$("dRes").innerHTML="";
+const ch=q.c.map((c,k)=>({c,k})).sort(()=>Math.random()-.5);
+$("dCh").innerHTML="";ch.forEach(o=>{const b=document.createElement("button");b.className="ch";b.textContent=o.c[0];b.onclick=()=>answer(o.c,b);$("dCh").appendChild(b)});
+$("ovDec").classList.add("on");dec=Date.now();const bar=$("dBar");
+clearInterval(tmr);tmr=setInterval(()=>{const left=Math.max(0,15-(Date.now()-dec)/1e3);bar.style.width=left/15*100+"%";if(left<=0){clearInterval(tmr);answer(["",0,"Vaxt bitdi. Real vəziyyətdə tərəddüd etmə: dayan, uzaqlaş, 102/112/805-ə zəng et."])}},100)}
+function answer(c,btn){clearInterval(tmr);document.querySelectorAll(".ch").forEach(b=>b.disabled=true);
+const left=Math.max(0,15-(Date.now()-dec)/1e3),ok=c[1]===1;
+if(ok){G.combo++;const pts=100+Math.round(left*5)+G.combo*10;G.score+=pts;G.res[G.i]=1;G.cleared[G.i]=1;snd(660);setTimeout(()=>snd(880),120)}
+else{G.combo=0;G.lives--;G.res[G.i]=0;G.shake=18;G.flash=1;snd(140,.4,"sawtooth")}
+hud();
+$("dRes").innerHTML=`<div class="res ${ok?"ok":"no"}"><b>${ok?"Düzgün qərar!":"Təhlükəli seçim!"}</b><p style="color:inherit;margin-top:4px">${c[2]}</p>${ok?`<p style="color:inherit;margin-top:4px">📞 Məlumat verildi: 102 / 112 / 805. Ərazi qurumlara bildirildi.</p>`:""}<button class="btn b1" style="margin-top:12px" id="nx">Davam et</button></div>`;
+$("nx").onclick=()=>{$("ovDec").classList.remove("on");G.i++;if(G.lives<=0)return finish(false);G.s="walk"};$("nx").focus()}
+async function finish(win){G.s="over";const cor=G.res.filter(r=>r===1).length;
+const total=G.score+(win?G.lives*50:0);const stars=!cor?0:win?(G.lives===3?3:G.lives===2?2:1):1;
+if(total>st.best){st.best=total;st.rank=rank(cor);save()}
+$("endBox").innerHTML=`<div class="zone">${win?"MİSSİYA TAMAMLANDI":"MİSSİYA BAŞA ÇATDI"}</div><h2>${win?"Kəndə sağ-salamat çatdın":"Bu dəfə alınmadı, yenidən cəhd et"}</h2><div class="stars">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div><div class="stat"><span>${total} xal</span><span>${cor}/${L.length} düzgün</span><span>${rank(cor)}</span></div><div id="tips" style="color:var(--mu);font-size:.92rem">AI tövsiyə hazırlanır...</div><div class="row" style="margin-top:16px"><button class="btn b1" onclick="startGame()">Yenidən oyna</button><button class="btn b2" onclick="go('cert')">Sertifikat</button></div>`;
+$("ovEnd").classList.add("on");G.total=total;G.cor=cor;
+const wrong=L.filter((_,i)=>G.res[i]!==1).map(q=>q.tp);
+try{const r=await fetch(API+"/api/recommendations",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({score:total,totalQuestions:L.length,level:rank(cor),wrongTopics:wrong})});const d=await r.json();
+$("tips").innerHTML=`<p>${d.summary||""}</p><ul style="padding-left:18px;margin-top:6px">${(d.tips||[]).map(t=>`<li>${t}</li>`).join("")}</ul>`}catch(e){$("tips").textContent="Şübhəli əşyaya toxunma, uzaqlaş və 102 / 112 / 805 xəttinə zəng et."}}
+/* drawing */
+let cam=0,dust=[];
+const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t)),rgb=c=>`rgb(${c})`;
+function sky(p){const A=[[96,128,190],[255,189,140]],B=[[70,140,220],[200,230,248]],C=[[58,84,150],[255,150,80]],[u,v]=p<.5?[A,B]:[B,C],t=p<.5?p*2:(p-.5)*2;return[mix(u[0],v[0],t),mix(u[1],v[1],t)]}
+function hill(sp,col,amp,base,fr,ph){x.fillStyle=col;x.beginPath();x.moveTo(0,H);for(let i=0;i<=W;i+=12){const u=(i+cam*sp)*fr;x.lineTo(i,base+Math.sin(u+ph)*amp+Math.sin(u*2.3)*amp*.3)}x.lineTo(W,H);x.fill()}
+function draw(){const p=Math.min(1,G.px/END),T=Date.now()/1e3,[a,b]=sky(p);x.save();
+if(G.shake>.5){x.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake);G.shake*=.9}
+let g=x.createLinearGradient(0,0,0,GY);g.addColorStop(0,rgb(a));g.addColorStop(1,rgb(b));x.fillStyle=g;x.fillRect(0,0,W,H);
+const sx0=720-p*90,sy0=90+p*160;g=x.createRadialGradient(sx0,sy0,5,sx0,sy0,190);g.addColorStop(0,"rgba(255,244,200,.95)");g.addColorStop(.3,"rgba(255,215,140,.35)");g.addColorStop(1,"rgba(255,200,120,0)");x.fillStyle=g;x.fillRect(0,0,W,H);x.fillStyle="#fff6d6";x.beginPath();x.arc(sx0,sy0,32,0,7);x.fill();
+x.fillStyle="rgba(255,255,255,.5)";for(let i=0;i<7;i++){const cx=((i*260+T*8-cam*.1)%1300+1300)%1300-170,cy=50+i%3*45;for(let k=0;k<4;k++){x.beginPath();x.ellipse(cx+k*30,cy+(k%2)*8,44-k*6,16,0,0,7);x.fill()}}
+x.strokeStyle="rgba(30,40,50,.6)";x.lineWidth=2;for(let i=0;i<4;i++){const bx=((T*40+i*90)%1100)-80,by=120+i*22+Math.sin(T*3+i)*8,w=Math.sin(T*9+i)*5;x.beginPath();x.moveTo(bx-9,by+w);x.quadraticCurveTo(bx-4,by-4,bx,by);x.quadraticCurveTo(bx+4,by-4,bx+9,by+w);x.stroke()}
+hill(.08,rgb(mix(b,[110,130,160],.55)),55,235,.003,1);hill(.2,rgb(mix(b,[70,110,110],.6)),40,270,.005,2);hill(.4,rgb(mix(b,[40,95,70],.75)),28,300,.008,4);
+g=x.createLinearGradient(0,GY-110,0,GY-10);g.addColorStop(0,"rgba(255,255,255,0)");g.addColorStop(1,rgb(b).replace("rgb","rgba").replace(")",",.55)"));x.fillStyle=g;x.fillRect(0,GY-110,W,100);
+for(let i=0;i<40;i++){const sx=i*190+60-cam*.7;if(sx<-60||sx>W+60)continue;x.fillStyle="rgba(0,0,0,.18)";x.beginPath();x.ellipse(sx+14,GY-18,30,6,0,0,7);x.fill();x.fillStyle="#5a3d26";x.fillRect(sx-4,GY-66,8,46);
+if(i%2){x.fillStyle="#174a33";for(let k=0;k<3;k++){x.beginPath();x.moveTo(sx-26+k*4,GY-40-k*24);x.lineTo(sx,GY-84-k*24);x.lineTo(sx+26-k*4,GY-40-k*24);x.fill()}}
+else{x.fillStyle="#1f5a3e";x.beginPath();x.arc(sx,GY-78,30,0,7);x.fill();x.fillStyle="#2c7a50";x.beginPath();x.arc(sx-9,GY-86,17,0,7);x.fill()}}
+for(let i=0;i<8;i++){const sx=i*620+300-cam;if(sx<-140||sx>W+60)continue;x.fillStyle="rgba(0,0,0,.2)";x.fillRect(sx+86,GY-14,34,8);x.fillStyle="#d9c7a1";x.fillRect(sx,GY-70,86,60);x.fillStyle="#bba983";x.fillRect(sx+62,GY-70,24,60);x.fillStyle="#9c4a37";x.beginPath();x.moveTo(sx-10,GY-70);x.lineTo(sx+43,GY-112);x.lineTo(sx+96,GY-70);x.fill();x.fillStyle="#6b4a3a";x.fillRect(sx+64,GY-108,10,22);
+x.fillStyle=p>.65?"#ffd27a":"#2b4358";x.fillRect(sx+10,GY-52,16,16);x.fillRect(sx+62,GY-52,16,16);x.fillStyle="#3a2a20";x.fillRect(sx+34,GY-44,16,34);
+x.fillStyle="rgba(235,235,235,.5)";for(let k=0;k<3;k++){x.beginPath();x.arc(sx+69+Math.sin(T+k)*6,GY-118-k*16-(T*9%16),6+k*2,0,7);x.fill()}}
+g=x.createLinearGradient(0,GY-14,0,H);g.addColorStop(0,"#3c8a4a");g.addColorStop(1,"#1d4a2a");x.fillStyle=g;x.fillRect(0,GY-14,W,H);
+for(let k=-1;k<16;k++){const fx=k*70-cam%70;x.fillStyle="#5b4630";x.fillRect(fx,GY-4,5,26);x.fillRect(fx,GY+2,70,3);x.fillRect(fx,GY+11,70,3)}
+g=x.createLinearGradient(0,GY+14,0,GY+82);g.addColorStop(0,"#a07c52");g.addColorStop(1,"#6f5233");x.fillStyle=g;x.fillRect(0,GY+14,W,68);x.fillStyle="#00000022";x.fillRect(0,GY+78,W,5);
+x.fillStyle="#7d6240";for(let i=0;i<40;i++){const px=((i*97-cam)%W+W)%W;x.fillRect(px,GY+22+(i*13)%46,5,3)}
+L.forEach((q,i)=>{const sx=hz(i)-cam;if(sx<-150||sx>W+150)return;hazard(i,sx,GY+30)});
+const bob=G.s==="walk"&&G.hold?Math.abs(Math.sin(G.ph))*3:Math.sin(T*2)*.8,py=GY+34+G.lane-bob,sx=G.px-cam,sw=Math.sin(G.ph)*(G.hold?11:2);
+x.fillStyle="rgba(0,0,0,.3)";x.beginPath();x.ellipse(sx+6,py+bob+34,22,6,0,0,7);x.fill();
+x.lineCap="round";x.lineWidth=8;x.strokeStyle="#1b2a38";x.beginPath();x.moveTo(sx-3,py+4);x.lineTo(sx-3-sw,py+32+bob);x.stroke();x.strokeStyle="#2a3f52";x.beginPath();x.moveTo(sx+3,py+4);x.lineTo(sx+3+sw,py+32+bob);x.stroke();
+x.fillStyle="#3b2a1c";x.fillRect(sx-10,py+30+bob,12,5);x.fillRect(sx+2,py+30+bob,12,5);
+x.fillStyle="#5b6b3a";x.fillRect(sx-22,py-28,14,28);x.fillStyle="#ff8a1f";x.beginPath();x.roundRect(sx-13,py-32,26,40,6);x.fill();x.fillStyle="#ffd24a";x.fillRect(sx-13,py-12,26,4);
+x.strokeStyle="#e8a070";x.lineWidth=6;x.beginPath();x.moveTo(sx+2,py-24);x.lineTo(sx+8+sw*.9,py-4);x.stroke();
+x.fillStyle="#ffcba0";x.beginPath();x.arc(sx,py-44,12,0,7);x.fill();x.fillStyle="#2f2218";x.beginPath();x.arc(sx,py-48,12.5,Math.PI,0);x.fill();x.fillRect(sx-4,py-51,18,4);x.fillStyle="#222";x.fillRect(sx+4,py-45,3,3);
+if(G.s==="walk"&&G.px<150&&!G.i){x.fillStyle="rgba(8,20,31,.8)";x.beginPath();x.roundRect(sx-88,py-100,190,28,14);x.fill();x.fillStyle="#fff";x.font="700 14px Manrope";x.fillText("→ düyməsini basılı saxla",sx-72,py-81)}
+dust=dust.filter(d=>d.l>0);dust.forEach(d=>{d.x+=d.vx*.016;d.y+=d.vy*.016;d.l-=.03;x.fillStyle=`rgba(200,170,120,${d.l*.5})`;x.beginPath();x.arc(d.x-cam,d.y,5*(1.4-d.l)+2,0,7);x.fill()});
+x.strokeStyle="#2b7a3d";x.lineWidth=2;for(let i=0;i<30;i++){const fx=((i*53-cam*1.3)%(W+80)+W+80)%(W+80)-40,h=14+(i*7)%12,w=Math.sin(T*2+i)*3;x.beginPath();x.moveTo(fx,H);x.quadraticCurveTo(fx+w,H-h*.6,fx+w*2+(i%3-1)*4,H-h);x.stroke()}
+if(G.i>=L.length){const fx=END-60-cam;x.fillStyle="#ddd";x.fillRect(fx,GY-130,5,150);x.fillStyle="#4ade80";x.beginPath();x.moveTo(fx+5,GY-130);x.quadraticCurveTo(fx+35,GY-120+Math.sin(T*4)*5,fx+68,GY-130);x.lineTo(fx+68,GY-96);x.quadraticCurveTo(fx+35,GY-88+Math.sin(T*4)*5,fx+5,GY-96);x.fill();x.fillStyle="#08141f";x.font="800 14px Manrope";x.fillText("KƏND",fx+16,GY-107)}
+g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,`rgba(255,170,90,${p*.18})`);g.addColorStop(1,"rgba(255,170,90,0)");x.fillStyle=g;x.fillRect(0,0,W,H);
+g=x.createRadialGradient(W/2,H/2,H*.45,W/2,H/2,W*.62);g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.5)");x.fillStyle=g;x.fillRect(0,0,W,H);
+if(G.flash>0){x.fillStyle=`rgba(255,60,50,${G.flash*.45})`;x.fillRect(0,0,W,H);G.flash-=.04}
+x.restore()}
+function hazard(i,sx,y){const c=G.cleared[i],T=Date.now()/1e3;x.fillStyle="rgba(0,0,0,.28)";x.beginPath();x.ellipse(sx+10,y+8,46,9,0,0,7);x.fill();
+if(i===0){x.save();x.translate(sx,y-4);x.rotate(-.3);let g=x.createLinearGradient(0,-12,0,12);g.addColorStop(0,"#d0d9e0");g.addColorStop(.5,"#8a95a0");g.addColorStop(1,"#4d5660");x.fillStyle=g;x.beginPath();x.roundRect(-28,-12,56,24,8);x.fill();x.fillStyle="#7a4a2a66";x.fillRect(-10,-12,9,24);x.fillStyle=`rgba(255,255,255,${.4+Math.sin(T*4)*.4})`;x.fillRect(12,-9,5,3);x.restore()}
+if(i===1){x.fillStyle="#555";x.fillRect(sx-64,y-36,6,54);x.fillRect(sx+58,y-36,6,54);x.strokeStyle="#fff";x.lineWidth=2;x.beginPath();x.moveTo(sx-60,y-22);x.lineTo(sx+60,y-22);x.stroke();x.strokeStyle="#ff5a4d";x.setLineDash([10,8]);x.beginPath();x.moveTo(sx-60,y-12);x.lineTo(sx+60,y-12);x.stroke();x.setLineDash([]);x.fillStyle="#666";x.fillRect(sx-2,y-52,5,56);x.fillStyle="#ffb81c";x.strokeStyle="#111";x.lineWidth=3;x.beginPath();x.moveTo(sx,y-110);x.lineTo(sx+32,y-54);x.lineTo(sx-32,y-54);x.closePath();x.fill();x.stroke();x.fillStyle="#111";x.font="800 26px Manrope";x.fillText("!",sx-5,y-64);x.fillStyle="#fff";x.font="800 9px Manrope";x.fillText("MİNA",sx-12,y-45)}
+if(i===2){x.fillStyle="#4a3a28";x.beginPath();x.ellipse(sx-2,y+12,38,11,0,0,7);x.fill();let g=x.createLinearGradient(sx-14,0,sx+14,0);g.addColorStop(0,"#8a8a4a");g.addColorStop(.5,"#6b6a3a");g.addColorStop(1,"#3f3e22");x.fillStyle=g;x.beginPath();x.ellipse(sx,y-2,15,30,.45,0,7);x.fill();x.fillStyle="#9a5a2a88";x.fillRect(sx-8,y-6,14,6)}
+if(i===3){x.fillStyle="#554e47";x.fillRect(sx-42,y-80,84,76);x.fillStyle="#3a3631";x.fillRect(sx+16,y-80,26,76);x.fillStyle="#2a2623";x.beginPath();x.moveTo(sx-54,y-80);x.lineTo(sx-8,y-118);x.lineTo(sx+54,y-80);x.fill();x.fillStyle="#0c0c0c";x.fillRect(sx-12,y-44,20,40);x.fillRect(sx-34,y-62,14,16);x.strokeStyle="#8b6b4a";x.lineWidth=3;x.beginPath();x.moveTo(sx-70,y+10);x.lineTo(sx-20,y-4);x.stroke()}
+if(i===4){x.fillStyle="#7a8a96";x.beginPath();x.arc(sx+44,y+8,13,0,7);x.fill();x.fillStyle="#3b82f6";x.beginPath();x.roundRect(sx+6,y-34,20,38,5);x.fill();x.strokeStyle="#ffcba0";x.lineWidth=5;x.lineCap="round";x.beginPath();x.moveTo(sx+24,y-24);x.lineTo(sx+38,y-2+Math.sin(T*5)*3);x.stroke();x.fillStyle="#ffcba0";x.beginPath();x.arc(sx+16,y-46,11,0,7);x.fill();x.fillStyle="#6b3b1b";x.beginPath();x.arc(sx+16,y-50,11,Math.PI,0);x.fill()}
+if(c){x.strokeStyle="#ff5a4d";x.lineWidth=5;x.setLineDash([12,10]);x.beginPath();x.moveTo(sx-95,y-16);x.lineTo(sx+95,y-16);x.stroke();x.setLineDash([]);x.fillStyle="rgba(8,20,31,.85)";x.beginPath();x.roundRect(sx-48,y-48,96,22,11);x.fill();x.fillStyle="#fff";x.font="800 12px Manrope";x.fillText("✓ BİLDİRİLDİ",sx-38,y-33)}
+else if(G.s!=="idle"&&G.i===i){const p=(Date.now()%1200)/1200;x.strokeStyle=`rgba(255,90,77,${1-p})`;x.lineWidth=3;x.beginPath();x.arc(sx,y-14,30+p*80,0,7);x.stroke()}}
+function loop(t){const dt=Math.min(.05,(t-G.last)/1e3||0);G.last=t;
+if(G.s==="walk"){const sp=G.hold?230:0;
+const tgt=G.i<L.length?hz(G.i)-230:END;G.px=Math.min(tgt,G.px+sp*dt);if(sp){G.ph+=dt*12;if(Math.random()<.6)dust.push({x:G.px-10,y:GY+66,vx:-25-Math.random()*30,vy:-8-Math.random()*18,l:1})}
+const near=G.i<L.length&&hz(G.i)-G.px<520;$("alert").style.display=near?"block":"none";
+if(near&&!G._n)snd(300,.2,"square");G._n=near;
+if(G.i<L.length&&G.px>=tgt-1)openDec();else if(G.i>=L.length&&G.px>=END-1)finish(true)}
+let ln=0;for(let i=0;i<L.length;i++)if(G.cleared[i]&&Math.abs(G.px-hz(i))<150)ln=28;G.lane+=(ln-G.lane)*.1;
+cam=Math.max(0,G.px-320);draw();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+/* chat */
+function bub(r,t){const d=document.createElement("div");d.className="bb "+r;d.textContent=t;$("chat").appendChild(d);$("chat").scrollTop=1e9}
+let hist=[];async function sendChat(){const v=$("ci").value.trim();if(!v)return;$("ci").value="";bub("u",v);
+try{const r=await fetch(API+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:v,messages:hist})});const d=await r.json();const a=d.reply||d.error||"Cavab alınmadı.";hist.push({role:"user",content:v},{role:"assistant",content:a});bub("b",a)}
+catch(e){bub("b","Serverlə əlaqə yoxdur. Təhlükə halında uzaqlaş və 102, 112 və ya 805-ə zəng et.")}}
+/* cert */
+function sync(){$("cD").textContent=new Date().toLocaleDateString("az-AZ");const sc=G.total||st.best||0,rk=G.total?rank(G.cor):(st.rank||"Başlanğıc");$("cS").textContent=sc;$("cI").textContent="MS-"+(10000+(sc*7919+(st.name||"x").length*104729)%89999);$("cR").textContent=rk;if(st.name){$("cN").textContent=st.name;$("nm").value=st.name}
+const rows=[...SAMPLE.map(r=>[r[0],r[1]>=450?"Təhlükəsizlik Eksperti":"Tədqiqatçı",r[1]]),[(st.name||"Sən")+" (Sən)",rk,sc]].sort((a,b)=>b[2]-a[2]);
+$("lb").innerHTML=rows.map(r=>`<tr><td>${r[0].replace(/</g,"&lt;")}</td><td>${r[1]}</td><td><b>${r[2]}</b></td></tr>`).join("")}
+function mkCert(){st.name=$("nm").value.trim()||"İştirakçı";save();sync()}
+sync();
+</script>
+</body>
+</html>
