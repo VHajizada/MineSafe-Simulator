@@ -3,186 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MineSafe Simulator — Təhlükəsiz qərar verməyi oyunla öyrən</title>
+<title>SafePoint AI — One Decision Can Save a Life</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#08141f;--bg2:#0f2233;--line:#22394d;--tx:#eaf1f6;--mu:#8fa5b6;--amb:#ffb81c;--grn:#4ade80;--red:#ff5a4d;--r:16px}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.6}
-h1,h2,h3{font-family:'Bricolage Grotesque',Manrope,sans-serif;letter-spacing:-.02em;line-height:1.1}
-.tape{height:10px;background:repeating-linear-gradient(-45deg,var(--amb) 0 14px,#111 14px 28px)}
-nav{position:sticky;top:0;z-index:50;background:#08141fee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav{max-width:1180px;margin:auto;padding:10px 18px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.logo{font:800 1.15rem 'Bricolage Grotesque';cursor:pointer}.logo b{color:var(--amb)}
-.tabs{display:flex;gap:4px;flex-wrap:wrap}
-.tabs button{background:none;border:0;color:var(--mu);font:600 .86rem Manrope;padding:8px 12px;border-radius:10px;cursor:pointer}
-.tabs button:hover,.tabs button.on{color:var(--tx);background:var(--bg2)}
-.tabs button.on{box-shadow:inset 0 -2px var(--amb)}
-main{max-width:1180px;margin:auto;padding:28px 18px 70px}
-.pg{display:none}.pg.on{display:block}
-.btn{border:0;border-radius:12px;padding:13px 22px;font:800 .95rem Manrope;cursor:pointer;transition:.15s}
-.btn:hover{transform:translateY(-2px)}.btn:focus-visible,.ch:focus-visible{outline:3px solid #fff}
-.b1{background:var(--amb);color:#1a1200}.b2{background:var(--bg2);color:var(--tx);border:1px solid var(--line)}
-.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:34px 0}
-.hero h1{font-size:clamp(2.2rem,5vw,3.8rem)}
-.hero p{color:var(--mu);margin:16px 0 24px;max-width:540px}
-.hero svg{width:100%;border-radius:22px;border:1px solid var(--line)}
-.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:22px}
-.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:22px}
-.card h3{font-size:1.1rem;margin-bottom:8px}.card p{color:var(--mu);font-size:.92rem}
-.card .big{font:800 2.3rem 'Bricolage Grotesque';color:var(--amb)}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.chips span{font-size:.78rem;font-weight:700;padding:5px 11px;border-radius:99px;background:#16324a;color:#bcd6e8}
-.sec{margin:42px 0 6px;font-size:1.7rem}
-/* GAME */
-.gw{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;touch-action:none}
+:root{--ink:#0b1f3a;--tx:#0b1f3a;--mu:#5d7088;--bg:#f5f7fb;--bg2:#fff;--card:#fff;--line:#e3e9f1;--amb:#ffb81c;--amb2:#ff8a1f;--navy:#08162b;--grn:#12b886;--red:#e5483b;--r:20px;--sh:0 1px 2px #0b1f3a0d,0 14px 34px #0b1f3a14}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--bg);color:var(--tx);line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Bricolage Grotesque',Manrope,sans-serif;letter-spacing:-.025em;line-height:1.08;color:var(--ink)}
+::selection{background:var(--amb)}
+.hd{position:sticky;top:0;z-index:60;background:#ffffffd9;backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid transparent;transition:.3s}
+.hd.sc{border-color:var(--line);box-shadow:0 6px 24px #0b1f3a0f}
+.nav{max-width:1200px;margin:auto;padding:12px 24px;display:flex;align-items:center;gap:18px}
+.logo{display:flex;align-items:center;gap:10px;font:800 1.2rem 'Bricolage Grotesque';cursor:pointer;color:var(--ink)}.logo b{color:var(--amb2)}
+.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto}
+.tabs button{background:none;border:0;color:var(--mu);font:700 .86rem Manrope;padding:9px 13px;border-radius:10px;cursor:pointer;white-space:nowrap;transition:.2s}
+.tabs button:hover{color:var(--ink);background:#eef2f8}.tabs button.on{color:var(--ink);background:#fff1cc}
+.navcta{padding:10px 18px;font-size:.86rem}
+@media(max-width:1020px){.navcta{display:none}.nav{flex-wrap:wrap}.tabs{margin-left:0;width:100%}}
+.btn{position:relative;overflow:hidden;border:0;border-radius:14px;padding:14px 26px;font:800 .95rem Manrope;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px)}.btn:focus-visible,.ch:focus-visible{outline:3px solid #ff8a1f}
+.b1{background:linear-gradient(135deg,#ffc83d,var(--amb2));color:#2a1700;box-shadow:0 10px 26px #ff8a1f4d}
+.b1::after{content:"";position:absolute;top:0;left:-70%;width:50%;height:100%;background:linear-gradient(100deg,transparent,#fff9,transparent);transform:skewX(-20deg);transition:left .6s}.b1:hover::after{left:130%}
+.b2{background:#fff;color:var(--ink);border:1.5px solid var(--line)}.b2:hover{border-color:var(--ink)}
+.pg{display:none}.pg.on{display:block;animation:fi .5s}@keyframes fi{from{opacity:0;transform:translateY(10px)}}
+.pg:not(#home){max-width:1200px;margin:auto;padding:48px 24px 90px}
+.wrap{max-width:1200px;margin:auto;padding:0 24px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff,#eaf1fa)}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;animation:bf 14s ease-in-out infinite}
+.b-a{width:440px;height:440px;background:#ffd36b;top:-140px;right:-60px}.b-b{width:380px;height:380px;background:#8fd3ff;left:-140px;top:140px;animation-delay:-5s}.b-c{width:340px;height:340px;background:#b8f0d6;right:30%;bottom:-180px;animation-delay:-9s}
+@keyframes bf{50%{transform:translate(40px,30px) scale(1.12)}}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:center;padding:88px 24px 100px}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr;padding-top:56px}}
+.pill{display:inline-flex;gap:9px;align-items:center;padding:8px 16px;border-radius:99px;background:#fff;border:1px solid var(--line);font:800 .78rem Manrope;color:var(--ink);box-shadow:var(--sh)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--grn);animation:pl 2s infinite}@keyframes pl{0%{box-shadow:0 0 0 0 #12b88688}70%,100%{box-shadow:0 0 0 10px #12b88600}}
+.hero h1{font-size:clamp(2.7rem,5.8vw,4.7rem);margin:22px 0 18px}
+.grad{background:linear-gradient(100deg,#ff8a1f,#ffb81c 50%,#ff5a4d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:1.13rem;color:var(--mu);max-width:540px}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;font-weight:700;font-size:.85rem;color:var(--mu)}
+.mock{position:relative}
+.win{background:#fff;border-radius:22px;border:1px solid var(--line);box-shadow:0 34px 80px #0b1f3a30;overflow:hidden;animation:fl 8s ease-in-out infinite}
+.win svg{display:block;width:100%}
+.wbar{display:flex;align-items:center;gap:7px;padding:12px 16px;background:#f3f6fb;border-bottom:1px solid var(--line);font-size:.74rem;color:var(--mu);font-weight:700}.wbar i{width:10px;height:10px;border-radius:50%;background:#d5dde8}.wbar span{margin-left:10px}
+@keyframes fl{50%{transform:translateY(-10px)}}
+.float{position:absolute;background:#ffffffee;backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:16px;padding:12px 16px;box-shadow:var(--sh);font-weight:700;font-size:.84rem;animation:fl 6s ease-in-out infinite}
+.f1{left:-26px;bottom:42px}.f2{right:-14px;top:70px;animation-delay:-3s}.float b{color:var(--grn)}
+@media(max-width:900px){.f1{left:8px}.f2{right:8px}}
+.stband{background:var(--navy);color:#fff}.st4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:20px;padding:44px 24px}
+.st4 div{text-align:center}.st4 b{display:block;font:800 2.8rem/1 'Bricolage Grotesque';background:linear-gradient(180deg,#fff,#ffc83d);-webkit-background-clip:text;background-clip:text;color:transparent}.st4 span{color:#9fb3c8;font-size:.86rem;font-weight:600}
+.sx{padding:96px 0}.shd{text-align:center;max-width:680px;margin:0 auto 52px}.shd h2{font-size:clamp(2rem,4vw,3rem);margin:10px 0 12px}.shd p{color:var(--mu)}
+.kick{display:inline-flex;align-items:center;gap:10px;font:800 .74rem Manrope;letter-spacing:.16em;color:var(--amb2);text-transform:uppercase;margin-bottom:12px}.kick::before{content:"";width:26px;height:2px;background:var(--amb2)}
+.shd .kick::before{display:none}
+.ph{margin-bottom:26px;max-width:760px}.ph h2{font-size:clamp(1.8rem,3.6vw,2.6rem)}.ph p{color:var(--mu);margin-top:10px}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:22px}
+.grid2{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;box-shadow:var(--sh);transition:transform .3s,box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 24px 50px #0b1f3a1f;border-color:#ffd88a}
+.card h3{font-size:1.15rem;margin-bottom:8px}.card p{color:var(--mu);font-size:.94rem}
+.ico{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;font-size:1.5rem;background:linear-gradient(135deg,#fff1cc,#ffdc96);margin-bottom:18px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px;counter-reset:s}
+.step{position:relative;padding:28px 22px 22px;border-radius:var(--r);background:#fff;border:1px solid var(--line);box-shadow:var(--sh)}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:-18px;left:22px;width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#ffc83d,var(--amb2));color:#2a1700;font:800 1rem Manrope;display:grid;place-items:center;box-shadow:0 8px 20px #ff8a1f55}
+.step h3{font-size:1.05rem;margin-bottom:6px}.step p{color:var(--mu);font-size:.9rem}
+.aud{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}.aud span{padding:12px 22px;border-radius:99px;background:#fff;border:1px solid var(--line);font-weight:700;box-shadow:var(--sh)}
+.band{position:relative;overflow:hidden;border-radius:30px;padding:70px 28px;text-align:center;color:#fff;background:radial-gradient(600px 300px at 80% 0,#ff8a1f55,transparent),radial-gradient(500px 300px at 10% 100%,#12b88644,transparent),var(--navy)}
+.band h2{color:#fff;font-size:clamp(2rem,4vw,3rem);margin-bottom:14px}.band p{color:#b6c6d8;max-width:560px;margin:0 auto 28px}
+.note{margin-top:22px;padding:22px 26px;border-radius:var(--r);background:#fff8e6;border:1px solid #ffe2a1;color:#6b4a00;font-size:.92rem}
+.ft{background:var(--navy);color:#9fb3c8;padding:64px 0 30px;margin-top:0}
+.ftg{display:grid;grid-template-columns:1.6fr 1fr 1fr 1.2fr;gap:34px}@media(max-width:800px){.ftg{grid-template-columns:1fr 1fr}}
+.ft h4{color:#fff;font:800 .9rem Manrope;margin-bottom:14px}.ft a{display:block;color:#9fb3c8;font-size:.9rem;margin-bottom:9px;cursor:pointer;transition:.2s}.ft a:hover{color:var(--amb)}
+.ft .logo{color:#fff;margin-bottom:14px}.ft p{font-size:.88rem;max-width:300px}
+.ftb{border-top:1px solid #1d3350;margin-top:40px;padding-top:22px;font-size:.8rem;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s,transform .8s}.reveal.in{opacity:1;transform:none}.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+.card .big{font:800 .8rem Manrope;color:var(--amb2);letter-spacing:.12em;margin-bottom:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.chips span{font-size:.78rem;font-weight:700;padding:5px 12px;border-radius:99px;background:#eef3fa;color:var(--ink)}
+/* game */
+.gw{--tx:#eaf1f6;--mu:#8fa5b6;--line:#22394d;position:relative;border-radius:24px;overflow:hidden;border:1px solid #1d3350;background:#000;touch-action:none;box-shadow:0 34px 80px #0b1f3a40}
 canvas{display:block;width:100%;height:auto}
-.hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;gap:10px;padding:12px 16px;font-weight:800;pointer-events:none;flex-wrap:wrap}
-.hud>div{background:#08141fcc;border-radius:12px;padding:7px 13px;font-size:.9rem}
-.dots i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#33495b;margin-left:5px}
-.dots i.d{background:var(--grn)}.dots i.x{background:var(--red)}
-.alert{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:var(--red);color:#fff;font-weight:800;padding:8px 18px;border-radius:99px;display:none;animation:bl .7s infinite}
-@keyframes bl{50%{opacity:.45}}
-.ov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#04101ccc;padding:16px;overflow:auto}
-.ov.on{display:flex}
-.pn{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:24px;max-width:640px;width:100%}
-.pn h2{font-size:1.5rem;margin:6px 0 8px}.pn p{color:var(--mu)}
-.zone{font-size:.8rem;font-weight:800;color:var(--amb)}
-.tm{height:7px;background:#17303f;border-radius:9px;margin:14px 0;overflow:hidden}.tm i{display:block;height:100%;background:var(--amb);width:100%}
-.ch{display:block;width:100%;text-align:left;margin-top:9px;padding:13px 16px;border-radius:12px;border:1.5px solid var(--line);background:#0b1b29;color:var(--tx);font:600 .93rem Manrope;cursor:pointer}
-.ch:hover{border-color:var(--amb);background:#14293a}
-.res{margin-top:14px;padding:14px 16px;border-radius:12px;font-size:.92rem}
-.res.ok{background:#12351f;border:1px solid var(--grn)}.res.no{background:#3a1613;border:1px solid var(--red)}
-.mob{display:none;position:absolute;right:14px;bottom:14px}
-.mob button{width:84px;height:84px;border-radius:50%;border:0;background:var(--amb);font:800 1rem Manrope;box-shadow:0 8px 24px #0008}
+.hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;gap:10px;padding:14px 18px;font-weight:800;pointer-events:none;flex-wrap:wrap;color:#fff}
+.hud>div{background:#08162bcc;backdrop-filter:blur(8px);border:1px solid #ffffff22;border-radius:12px;padding:7px 14px;font-size:.9rem}
+.dots i{display:inline-block;width:11px;height:11px;border-radius:50%;background:#33495b;margin-left:5px}.dots i.d{background:#4ade80}.dots i.x{background:#ff5a4d}
+.alert{position:absolute;left:50%;top:66px;transform:translateX(-50%);background:var(--red);color:#fff;font-weight:800;padding:8px 18px;border-radius:99px;display:none;animation:bl .7s infinite}@keyframes bl{50%{opacity:.45}}
+.ov{--tx:#eaf1f6;--mu:#9fb3c8;--line:#22394d;position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#04101ccc;padding:16px;overflow:auto;color:#eaf1f6}.ov.on{display:flex}
+.pn{background:#0f2233ee;backdrop-filter:blur(14px);border:1px solid #22394d;border-radius:22px;padding:26px;max-width:640px;width:100%;box-shadow:0 30px 70px #000a;color:#eaf1f6}
+.pn h2{font-size:1.6rem;margin:6px 0 8px;color:#fff}.pn p{color:#9fb3c8}
+.zone{font-size:.78rem;font-weight:800;color:var(--amb);letter-spacing:.08em}
+.tm{height:7px;background:#e8eef6;border-radius:9px;margin:14px 0;overflow:hidden}.ov .tm{background:#17303f}.tm i{display:block;height:100%;background:var(--amb);width:100%}
+.ch{display:block;width:100%;text-align:left;margin-top:10px;padding:14px 18px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font:600 .94rem Manrope;cursor:pointer;transition:.2s}
+.ch:hover{border-color:var(--amb2);background:#fff9ea;transform:translateX(4px)}
+.ov .ch{background:#0b1b29;color:#eaf1f6}.ov .ch:hover{background:#14293a}
+.res{margin-top:14px;padding:14px 16px;border-radius:14px;font-size:.92rem}
+.res.ok{background:#e3f8ef;border:1px solid #9be3c6;color:#075c43}.res.no{background:#fdeceb;border:1px solid #f4b4ae;color:#8a241b}
+.ov .res.ok{background:#12351f;border-color:#4ade80;color:#dcfce7}.ov .res.no{background:#3a1613;border-color:#ff5a4d;color:#ffe1de}
+.ov .b2{background:#16324a;color:#fff;border-color:#2a4a66}
+.mob{display:none;position:absolute;right:14px;bottom:14px}.mob button{width:84px;height:84px;border-radius:50%;border:0;background:var(--amb);font:800 1rem Manrope;box-shadow:0 8px 24px #0008}
 @media(hover:none){.mob{display:block}}
-@media(max-width:820px){.hero{grid-template-columns:1fr}}
-.stars{font-size:2.4rem;letter-spacing:6px;color:var(--amb)}
-.stat{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0;font-weight:800}
+.stars{font-size:2.4rem;letter-spacing:6px;color:var(--amb)}.stat{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0;font-weight:800}
 /* misc */
-.chat{height:320px;overflow:auto;background:#0b1b29;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-.bb{padding:10px 14px;border-radius:14px;margin-bottom:10px;max-width:84%;white-space:pre-line;font-size:.92rem}
-.bb.u{background:var(--amb);color:#1a1200;margin-left:auto}.bb.b{background:var(--bg2);border:1px solid var(--line)}
-input{padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:#0b1b29;color:var(--tx);font:600 .93rem Manrope;flex:1;min-width:200px}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:.9rem}
-.cert{position:relative;margin-top:22px;border-radius:20px;padding:10px;background:linear-gradient(135deg,#f6d77a,#b8862b 35%,#f9e7a3 55%,#a8761f);box-shadow:0 30px 70px #0009;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.chat{height:340px;overflow:auto;background:#f1f5fa;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.bb{padding:11px 16px;border-radius:16px;margin-bottom:10px;max-width:84%;white-space:pre-line;font-size:.92rem}
+.bb.u{background:linear-gradient(135deg,#ffc83d,var(--amb2));color:#2a1700;margin-left:auto;border-bottom-right-radius:4px}.bb.b{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+input,select{padding:13px 16px;border-radius:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font:600 .94rem Manrope;flex:1;min-width:200px;outline:none;transition:.2s}input:focus{border-color:var(--amb2);box-shadow:0 0 0 4px #ffb81c33}
+table{width:100%;border-collapse:collapse}td,th{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:.9rem}th{color:var(--mu);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:20px}
+.kpi{background:#fff;border:1px solid var(--line);border-top:4px solid var(--amb);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+.ki{font-size:1.5rem}.kv{font:800 2.5rem/1.1 'Bricolage Grotesque';margin-top:4px;color:var(--ink)}.kl{font-weight:800;font-size:.9rem}.ks{color:var(--mu);font-size:.78rem}
+.hint{color:var(--mu);font-size:.86rem;margin:6px 0 16px}
+.brow{display:grid;grid-template-columns:30px 1fr auto;gap:6px 12px;align-items:center;margin-bottom:16px}
+.rk{width:30px;height:30px;border-radius:10px;background:#eef3fa;display:grid;place-items:center;font-weight:800;font-size:.82rem}
+.bn{font-weight:700;font-size:.92rem}.bn small{display:block;color:var(--mu);font-weight:600;font-size:.76rem}
+.tg{font-size:.72rem;font-weight:800;padding:3px 11px;border-radius:99px}.tg.r{background:#fde8e6;color:#c2352a}.tg.a{background:#fff1d1;color:#a86500}.tg.g{background:#d9f5ea;color:#0b7a57}
+.bar{height:10px;background:#e8eef6;border-radius:9px;overflow:hidden;grid-column:2/4}.bar i{display:block;height:100%;border-radius:9px;background:var(--amb);transition:width .9s}.bar.g i{background:var(--grn)}.bar.r i{background:var(--red)}
+.irow{margin-bottom:22px}.it{font-weight:800;margin-bottom:8px}
+.ib{display:grid;grid-template-columns:54px 1fr 46px;gap:10px;align-items:center;margin-bottom:6px;font-size:.84rem}.ib .bar{grid-column:auto}.ib b{text-align:right}
+.delta{display:inline-block;margin-top:6px;padding:5px 12px;border-radius:99px;font-weight:800;font-size:.84rem}.delta.up{background:#d9f5ea;color:#0b7a57}.delta.dn{background:#fde8e6;color:#c2352a}
+.empty{text-align:center;padding:26px 10px;color:var(--mu)}.empty b{display:block;font-size:2rem}
+#insight{margin-top:20px;border-left:4px solid var(--amb2)}
+/* certificate */
+.cert{position:relative;margin-top:24px;border-radius:22px;padding:10px;background:linear-gradient(135deg,#f6d77a,#b8862b 35%,#f9e7a3 55%,#a8761f);box-shadow:0 30px 70px #0b1f3a40;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .ci{position:relative;overflow:hidden;border-radius:12px;background:radial-gradient(circle at 50% 0,#fffdf6,#f1ead6 75%);color:#10202e;text-align:center;padding:0 28px 32px;border:2px solid #0c1b29;outline:1px solid #b8862b;outline-offset:-10px}
 .ci::before{content:"M";position:absolute;inset:0;display:grid;place-items:center;font:800 26rem 'Bricolage Grotesque';color:#0c1b29;opacity:.04;pointer-events:none}
 .cband{height:16px;margin:0 -28px 22px;background:repeating-linear-gradient(-45deg,#ffb81c 0 14px,#111 14px 28px)}
 .ck{font-weight:800;letter-spacing:.18em;font-size:.78rem;color:#6b5420}
-.cert h2{font-size:clamp(2rem,5vw,3.3rem);margin:8px 0 2px;color:#0c1b29}
-.sub{color:#5b6b78;font-size:.95rem;margin-bottom:18px}
+.cert h2{font-size:clamp(2rem,5vw,3.3rem);margin:8px 0 2px;color:#0c1b29}.sub{color:#5b6b78;font-size:.95rem;margin-bottom:18px}
 .cert .nm{font:800 clamp(1.8rem,4.5vw,3rem) 'Bricolage Grotesque';background:linear-gradient(90deg,#9a6c18,#e8b83c,#9a6c18);-webkit-background-clip:text;background-clip:text;color:transparent;border-bottom:2px solid #b8862b;padding:0 30px;margin:10px 0 14px;display:inline-block}
-.cbody{max-width:620px;margin:0 auto}
-.cf{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-top:26px;flex-wrap:wrap;font-size:.8rem;color:#4a5a67;text-align:left}
+.cbody{max-width:620px;margin:0 auto}.cf{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-top:26px;flex-wrap:wrap;font-size:.8rem;color:#4a5a67;text-align:left}
 .cf div{min-width:140px}.cf b{display:block;color:#10202e;font-size:.95rem;border-top:1.5px solid #10202e;padding-top:5px;margin-top:4px}
 .seal{width:112px;height:112px;filter:drop-shadow(0 6px 8px #0005)}
-body{background:radial-gradient(900px 500px at 85% -5%,#1d4a5c66,transparent),radial-gradient(700px 500px at 0 25%,#3a2a0a44,transparent),var(--bg);background-attachment:fixed}
-.hero h1{background:linear-gradient(180deg,#fff,#a9c3d6);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero svg{box-shadow:0 30px 80px #000a}
-.card{background:linear-gradient(160deg,#133048,#0c1d2c);transition:.25s}.card:hover{border-color:#ffb81c77;transform:translateY(-4px);box-shadow:0 18px 40px #0007}
-.b1{box-shadow:0 8px 26px #ffb81c44}.b1:hover{box-shadow:0 12px 34px #ffb81c88}
-.gw{box-shadow:0 30px 80px #000b}
-.pn{backdrop-filter:blur(14px);background:#0f2233ee;box-shadow:0 30px 70px #000a}
-.hud>div{backdrop-filter:blur(8px);border:1px solid #ffffff1c}
-.pg.on{animation:fi .4s}@keyframes fi{from{opacity:0;transform:translateY(8px)}}
 @page{size:landscape;margin:8mm}
-@media print{nav,.tape,.noprint{display:none!important}body{background:#fff}.pg{display:none!important}#cert{display:block!important}.cert{box-shadow:none}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.hd,.ft,.noprint{display:none!important}body{background:#fff}.pg{display:none!important}#cert{display:block!important;padding:0}.cert{box-shadow:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<div class="tape"></div>
-<nav><div class="nav">
-<div class="logo" onclick="go('home')">Mine<b>Safe</b> Simulator</div>
-<div class="tabs" id="tabs">
-<button data-p="home" class="on">Ana səhifə</button><button data-p="game">Oyun</button><button data-p="learn">Öyrən</button><button data-p="ai">AI köməkçi</button><button data-p="cert">Sertifikat</button>
-</div></div></nav>
+<nav class="hd" id="hd"><div class="nav">
+<div class="logo" onclick="go('home')"><svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#ffb81c"/><path d="M8.5 12l2.5 2.5L16 9" stroke="#08162b" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg><span>Safe<b>Point</b> AI</span></div>
+<div class="tabs" id="tabs"><button data-p="home" class="on">Ana səhifə</button><button data-p="game">SafeDecision</button><button data-p="ai">SafeCoach AI</button><button data-p="mem">SafeMemory</button><button data-p="dash">Analitika</button><button data-p="learn">Öyrən</button><button data-p="cert">Sertifikat</button></div>
+<button class="btn b1 navcta" onclick="go('game')">Oyuna başla</button></div></nav>
 
 <main>
 <section id="home" class="pg on">
-<div class="hero">
-<div>
-<h1>Bir düzgün qərar həyatı xilas edir.</h1>
-<p>Kəndin içindən keç, təhlükəli əşyalarla qarşılaş və saniyələr içində qərar ver. Real mina yoxdur — amma real vərdiş formalaşır: <b style="color:var(--tx)">dayan, toxunma, uzaqlaş, məlumat ver.</b></p>
-<div class="row"><button class="btn b1" onclick="go('game')">Oyuna başla</button><button class="btn b2" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'})">Layihə haqqında</button></div>
-</div>
-<svg viewBox="0 0 480 300" aria-label="Kənd mənzərəsi"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb06a"/><stop offset="1" stop-color="#4b6f9c"/></linearGradient></defs>
+<div class="hero"><i class="blob b-a"></i><i class="blob b-b"></i><i class="blob b-c"></i><div class="wrap">
+<div><span class="pill"><i></i>AI əsaslı mina təhlükəsizliyi platforması</span>
+<h1>One decision can <span class="grad">save a life.</span></h1>
+<p class="lead">SafePoint AI mina təhlükəsizliyini məlumatdan qərar vərdişinə çevirir: real situasiyalarda təcrübə et, səhvindən öyrən və irəliləyişini ölç.</p>
+<div class="row" style="margin-top:32px"><button class="btn b1" onclick="go('game')">Simulyasiyaya başla →</button><button class="btn b2" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Necə işləyir?</button></div>
+<div class="trust"><span>✓ Qeydiyyat tələb olunmur</span><span>✓ Telefonda işləyir</span><span>✓ Anonim istifadə</span></div></div>
+<div class="mock"><div class="win"><div class="wbar"><i></i><i></i><i></i><span>safepoint.ai / simulyasiya</span></div><svg viewBox="0 0 480 300" aria-label="Kənd mənzərəsi"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb06a"/><stop offset="1" stop-color="#4b6f9c"/></linearGradient></defs>
 <rect width="480" height="300" fill="url(#g)"/><circle cx="360" cy="90" r="34" fill="#ffe9a8"/>
 <path d="M0 200Q120 130 240 190T480 170V300H0Z" fill="#2c5a46"/><path d="M0 235Q160 190 480 230V300H0Z" fill="#1d4333"/>
 <rect x="70" y="170" width="60" height="42" fill="#d8c9a8"/><path d="M62 172l38-30 38 30z" fill="#a14b3a"/>
 <path d="M0 262h480" stroke="#7a5b3a" stroke-width="22"/>
 <g transform="translate(330 232)"><path d="M0 24 18-10 36 24z" fill="#ffb81c" stroke="#111" stroke-width="3"/><text x="14" y="20" font-size="16" font-weight="800">!</text><rect x="16" y="24" width="4" height="26" fill="#444"/></g>
-<rect width="480" height="8" y="292" fill="#ffb81c"/></svg>
-</div>
-<h2 class="sec" id="why">Niyə bu layihə?</h2>
-<div class="grid">
-<div class="card"><div class="big">Problem</div><h3>Qəfil qarşılaşma anı</h3><p>Mina və partlamamış sursat təhlükəsi olan ərazilərdə uşaqlar və sakinlər ən çox maraq və ya bilməməzlik üzündən risk edir. Oxumaq tez unudulur.</p></div>
-<div class="card"><div class="big">Həll</div><h3>Qərarı təcrübə ilə öyrət</h3><p>5 real həyat missiyası, vaxt təzyiqi, canlar və kombo sistemi: istifadəçi düzgün davranışı oynayaraq “əzbərləyir”.</p></div>
-<div class="card"><div class="big">Təsir</div><h3>Məktəb, ailə, icma</h3><p>Brauzerdə işləyir, quraşdırma tələb etmir, telefonda da oynanır. Nəticə sertifikatla təsdiqlənir.</p></div>
-</div>
-<div class="grid"><div class="card" style="border-left:4px solid var(--amb)"><h3>Etik qeyd</h3><p>Platforma real mina aşkarlama aləti deyil, real koordinatlardan istifadə etmir və yoxlama, toxunma və ya zərərsizləşdirmə təlimatı vermir. Yeganə təhlükəsiz yol: dayan, toxunma, uzaqlaş, 102 / 112 / 805 xəttinə zəng et.</p>
-<div class="chips"><span>HTML5 Canvas oyun mühərriki</span><span>Python Flask</span><span>Groq AI köməkçisi</span><span>Fərdi AI tövsiyə</span><span>Mobil uyğun</span><span>Web Audio səsləri</span></div></div></div>
+<rect width="480" height="8" y="292" fill="#ffb81c"/></svg></div>
+<div class="float f1">✅ Düzgün qərar <b>+125 xal</b></div><div class="float f2">🤖 SafeCoach: “Dayan, toxunma, uzaqlaş.”</div></div></div></div>
+<div class="stband"><div class="st4"><div><b data-count="5">0</b><span>real missiya</span></div><div><b data-count="15" data-suf=" san">0</b><span>qərar vaxtı</span></div><div><b data-count="5">0</b><span>AI komponent</span></div><div><b data-count="2">0</b><span>təcili xətt: 102 · 112</span></div></div></div>
+<div class="sx"><div class="wrap"><div class="shd reveal"><span class="kick">Platforma</span><h2>Bilikdən qərar vərdişinə</h2><p>Beş birləşmiş komponent insanı təhlükəli situasiyada düzgün addım atmağa hazırlayır.</p></div>
+<div class="grid" style="margin-top:0">
+<div class="card reveal"><div class="ico">🎮</div><div class="big">01</div><h3>SafeDecision</h3><p>Real həyat situasiyalarında interaktiv simulyasiya: qərar ver, səbəbini öyrən.</p></div>
+<div class="card reveal d1"><div class="ico">🤖</div><div class="big">02</div><h3>SafeCoach AI</h3><p>Suallarına cavab verir və simulyasiyadakı səhvini izah edir.</p></div>
+<div class="card reveal d2"><div class="ico">🧠</div><div class="big">03</div><h3>SafeMemory</h3><p>Səhv etdiyin mövzular 1, 3 və 7 gün aralıqla yenidən təqdim olunur.</p></div>
+<div class="card reveal d1"><div class="ico">📊</div><div class="big">04</div><h3>SafeAnalytics</h3><p>Anonim nəticələrdən ən zəif mənimsənilən qaydalar müəyyən edilir.</p></div>
+<div class="card reveal d2"><div class="ico">📈</div><div class="big">05</div><h3>SafeImpact</h3><p>Təlimdən əvvəl və sonra testlə platformanın təsiri ölçülür.</p></div></div></div></div>
+<div class="sx" id="how" style="background:#eaf1fa"><div class="wrap"><div class="shd reveal"><span class="kick">Necə işləyir</span><h2>Dörd sadə addım</h2></div>
+<div class="steps"><div class="step reveal"><h3>İlkin test</h3><p>3 sualla başlanğıc səviyyəni ölç.</p></div><div class="step reveal d1"><h3>SafeDecision</h3><p>Real situasiyada saniyələr içində qərar ver.</p></div><div class="step reveal d2"><h3>Öyrən və təkrarla</h3><p>SafeCoach səhvini izah edir, SafeMemory təkrarlayır.</p></div><div class="step reveal d3"><h3>Nəticəni gör</h3><p>SafeImpact əvvəl və sonranı müqayisə edir.</p></div></div></div></div>
+<div class="sx"><div class="wrap"><div class="shd reveal"><span class="kick">Auditoriya</span><h2>Kimlər üçün?</h2></div>
+<div class="aud reveal"><span>🎓 Məktəblilər və tələbələr</span><span>🧳 Turistlər</span><span>🏡 Qarabağa qayıdan ailələr</span><span>🏗️ Tikinti və infrastruktur işçiləri</span><span>🤝 Könüllülər</span></div>
+<div class="note reveal"><b>Etik qeyd:</b> Platforma real mina aşkarlama aləti deyil, real koordinatlardan istifadə etmir və yoxlama, toxunma və ya zərərsizləşdirmə təlimatı vermir. Yeganə təhlükəsiz yol: dayan, toxunma, uzaqlaş, 102 / 112 xəttinə zəng et.</div></div></div>
+<div class="wrap" style="padding-bottom:90px"><div class="band reveal"><h2>Növbəti qərar sənindir</h2><p>Beş dəqiqəlik simulyasiya real həyatda düzgün addım atmağa hazırlayır.</p><button class="btn b1" onclick="go('game')">İndi başla →</button></div></div>
 </section>
 
 <section id="game" class="pg">
-<h2 style="font-size:1.8rem;margin-bottom:6px">Kənd missiyası</h2>
+<div class="ph" style="margin-bottom:8px"><span class="kick">SafeDecision</span><h2>Kənd missiyası</h2></div>
 <p style="color:var(--mu);margin-bottom:16px">Qəhrəmanı <b>→</b> / <b>D</b> düyməsi ilə (mobildə sağdakı düymə ilə) irəli apar. Hər təhlükə nöqtəsində 15 saniyən var.</p>
 <div class="gw" id="gw">
 <canvas id="cv" width="960" height="460"></canvas>
 <div class="hud"><div id="hLives">❤️❤️❤️</div><div class="dots" id="hDots"></div><div id="hScore">0 xal · kombo x0</div></div>
 <div class="alert" id="alert">⚠ TƏHLÜKƏ SİQNALI — DAYAN!</div>
 <div class="mob"><button id="mb">İRƏLİ</button></div>
-<div class="ov on" id="ovStart"><div class="pn"><div class="zone">MİSSİYA</div><h2>Kəndə gedən yol</h2><p>5 təhlükə nöqtəsi səni gözləyir. Düzgün qərar xal və kombo qazandırır, təhlükəli seçim can aparır. Üç can itirsən, missiya başa çatır.</p><button class="btn b1" style="margin-top:16px" onclick="startGame()">Yola düş</button></div></div>
+<div class="ov on" id="ovStart"><div class="pn"><div class="zone">MİSSİYA</div><h2>Kəndə gedən yol</h2><p>5 təhlükə nöqtəsi səni gözləyir. Düzgün qərar xal və kombo qazandırır, təhlükəli seçim can aparır. Üç can itirsən, missiya başa çatır.</p><button class="btn b1" style="margin-top:16px" onclick="begin()">Yola düş</button></div></div>
 <div class="ov" id="ovDec"><div class="pn"><div class="zone" id="dZone"></div><h2 id="dT"></h2><p id="dD"></p><div class="tm"><i id="dBar"></i></div><div id="dCh"></div><div id="dRes"></div></div></div>
 <div class="ov" id="ovEnd"><div class="pn" id="endBox"></div></div>
+<div class="ov" id="ovQz"></div>
 </div>
 </section>
 
 <section id="learn" class="pg">
-<h2 style="font-size:1.8rem">Maarifləndirmə mərkəzi</h2>
+<div class="ph"><span class="kick">Bilik bazası</span><h2>Maarifləndirmə mərkəzi</h2></div>
 <div class="grid" id="topics"></div>
 </section>
 
 <section id="ai" class="pg">
-<h2 style="font-size:1.8rem;margin-bottom:14px">AI köməkçi</h2>
+<div class="ph"><span class="kick">SafeCoach AI</span><h2>Sualını ver, izahını al</h2></div>
 <div class="card"><div class="chat" id="chat"><div class="bb b">Salam! Mina təhlükəsizliyi, xəbərdarlıq nişanları və şübhəli əşya ilə qarşılaşdıqda təhlükəsiz addımlar barədə sual verə bilərsən.</div></div>
 <div class="row"><input id="ci" placeholder="Sualını yaz..." onkeydown="if(event.key==='Enter')sendChat()"><button class="btn b1" onclick="sendChat()">Göndər</button></div></div>
 </section>
 
+<section id="mem" class="pg"><span class="kick">SafeMemory</span><h2 style="font-size:1.8rem">Unutmaq əvəzinə təkrarla</h2><p style="color:var(--mu);margin:6px 0 16px">Səhv etdiyin mövzular aralıqlı təkrarlama ilə (dərhal, 1, 3, 7 gün) yenidən təqdim olunur.</p><div class="grid" id="memList"></div><div id="memQ" style="margin-top:18px"></div></section>
+<section id="dash" class="pg">
+<div class="ph"><span class="kick">SafeAnalytics · SafeImpact</span><h2>Nəticələr nə göstərir?</h2><p>Bu səhifə iki sualı cavablandırır: <b style="color:var(--tx)">insanlar hansı qaydaları çətin mənimsəyir?</b> və <b style="color:var(--tx)">təlim biliyi həqiqətən artırır?</b> Bütün məlumatlar anonimdir, ad və ya şəxsi məlumat toplanmır.</p></div>
+<div class="kpis" id="kpis"></div>
+<div class="grid2">
+<div class="card"><h3>📉 Ən çox səhv edilən mövzular</h3><p class="hint">Zolaq nə qədər uzundursa, o mövzuda bir o qədər çox səhv edilib. Qırmızı mövzulara təlimdə daha çox diqqət lazımdır.</p><div id="topicBars"></div></div>
+<div class="card"><h3>📈 SafeImpact: təlimdən əvvəl və sonra</h3><p class="hint">Oyundan əvvəl və sonra 3 sualluq test verilir. İki nəticənin fərqi təlimin təsirini göstərir.</p><div id="impact"></div></div>
+</div>
+<div class="card" id="insight"></div>
+</section>
 <section id="cert" class="pg">
-<h2 style="font-size:1.8rem;margin-bottom:14px">Nəticələr və sertifikat</h2>
+<div class="ph"><span class="kick">Sertifikat</span><h2>Nəticələr və sertifikat</h2></div>
 <div class="card noprint"><table><thead><tr><th>İştirakçı</th><th>Rütbə</th><th>Xal</th></tr></thead><tbody id="lb"></tbody></table>
 <div class="row" style="margin-top:16px"><input id="nm" placeholder="Ad və soyad"><button class="btn b1" onclick="mkCert()">Sertifikat yarat</button><button class="btn b2" onclick="print()">Çap et / PDF</button></div></div>
 <div class="cert"><div class="ci"><div class="cband"></div>
-<div class="ck">MINESAFE SIMULATOR · AZƏRBAYCAN</div>
+<div class="ck">SAFEPOINT AI · AZƏRBAYCAN</div>
 <svg class="seal" viewBox="0 0 120 120"><defs><radialGradient id="sg"><stop offset="0" stop-color="#fff2b0"/><stop offset=".6" stop-color="#e8b83c"/><stop offset="1" stop-color="#9a6c18"/></radialGradient></defs><path d="M38 80l-12 36 22-10 12 12 8-34zM82 80l12 36-22-10-12 12-8-34z" fill="#c0392b"/><circle cx="60" cy="52" r="46" fill="url(#sg)" stroke="#8a5d12" stroke-width="3"/><circle cx="60" cy="52" r="36" fill="none" stroke="#8a5d12" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M60 24l8 17 19 2-14 13 4 19-17-9-17 9 4-19-14-13 19-2z" fill="#0c1b29"/></svg>
 <h2>İştirak Sertifikatı</h2><div class="sub">Mina təhlükəsizliyi üzrə maarifləndirmə proqramı</div>
 <p>Bu sənəd təsdiq edir ki,</p><div class="nm" id="cN">İştirakçı</div>
 <p class="cbody">interaktiv mina təhlükəsizliyi missiyasını tamamlamış, <b id="cS">0</b> xal toplamış və <b id="cR">Başlanğıc</b> rütbəsinə layiq görülmüşdür. “Dayan, toxunma, uzaqlaş, məlumat ver” qaydası öyrənilmişdir.</p>
-<div class="cf"><div>Tarix<b id="cD">—</b></div><div style="text-align:center">Təcili xətlər<b>102 · 112 · 805</b></div><div style="text-align:right">Sertifikat №<b id="cI">MS-00000</b></div></div>
+<div class="cf"><div>Tarix<b id="cD">—</b></div><div style="text-align:center">Təcili xətlər<b>102 · 112</b></div><div style="text-align:right">Sertifikat №<b id="cI">MS-00000</b></div></div>
 <p style="margin-top:16px;font-size:.74rem;color:#6b7a86">Yalnız maarifləndirici simulyasiyadır. Real mina aşkarlama sistemi deyil.</p></div></div>
 </section>
 </main>
+<footer class="ft"><div class="wrap"><div class="ftg">
+<div><div class="logo"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="#ffb81c"/><path d="M8.5 12l2.5 2.5L16 9" stroke="#08162b" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg><span>Safe<b style="color:#ffb81c">Point</b> AI</span></div><p>Mina təhlükəsizliyi üzrə süni intellekt əsaslı interaktiv maarifləndirmə platforması.</p></div>
+<div><h4>Platforma</h4><a onclick="go('game')">SafeDecision</a><a onclick="go('ai')">SafeCoach AI</a><a onclick="go('mem')">SafeMemory</a><a onclick="go('dash')">Analitika</a></div>
+<div><h4>Resurslar</h4><a onclick="go('learn')">Maarifləndirmə</a><a onclick="go('cert')">Sertifikat</a></div>
+<div><h4>Təcili xətlər</h4><a>102 · Daxili İşlər Nazirliyi</a><a>112 · Fövqəladə Hallar Nazirliyi</a></div></div>
+<div class="ftb"><span>© 2026 SafePoint AI. One Decision Can Save a Life.</span><span>Yalnız maarifləndirici simulyasiya</span></div></div></footer>
 
 <script>
-const API="",KEY="minesafe_v3";
+const API="",KEY="safepoint_v1";
 const L=[
-{z:"Açıq sahə",tp:"Şübhəli əşya",t:"Otların arasında naməlum metal əşya",d:"Kənd kənarında gedirsən. Qarşıda daha əvvəl görmədiyin metal bir əşya parıldayır.",c:[["Yaxınlaşıb diqqətlə baxmaq",0,"Yaxınlaşmaq belə risk yaradır."],["Əşyaya toxunmaq və ya tərpətmək",0,"Toxunuş və ya hərəkət partlayışa səbəb ola bilər."],["Dayanmaq, toxunmamaq, geri çəkilmək və 102/112/805-ə zəng etmək",1,"Düzgün! Məsafə və rəsmi məlumat həyatı qoruyur."]]},
-{z:"Əkin sahəsi",tp:"Xəbərdarlıq nişanları",t:"Sahənin kənarında rəsmi təhlükə nişanı",d:"Nişanın arxası sakit və təhlükəsiz görünür, amma lent çəkilib.",c:[["Sahə sakit olduğu üçün qısa yolla keçmək",0,"Təhlükənin görünməməsi onun olmaması demək deyil."],["Girməmək, yaxındakıları xəbərdar etmək və qurumlara bildirmək",1,"Düzgün! Nişan rəsmi qadağadır."],["Yalnız lentin altından əyilib keçmək",0,"Qadağan zonaya daxil olmaq birbaşa risqdir."]]},
+{z:"Açıq sahə",tp:"Şübhəli əşya",t:"Otların arasında naməlum metal əşya",d:"Kənd kənarında gedirsən. Qarşıda daha əvvəl görmədiyin metal bir əşya parıldayır.",c:[["Yaxınlaşıb diqqətlə baxmaq",0,"Yaxınlaşmaq belə risk yaradır."],["Əşyaya toxunmaq və ya tərpətmək",0,"Toxunuş və ya hərəkət partlayışa səbəb ola bilər."],["Dayanmaq, toxunmamaq, geri çəkilmək və 102/112-ə zəng etmək",1,"Düzgün! Məsafə və rəsmi məlumat həyatı qoruyur."]]},
+{z:"Əkin sahəsi",tp:"Xəbərdarlıq nişanları",t:"Sahənin kənarında rəsmi təhlükə nişanı",d:"Nişanın arxası sakit və təhlükəsiz görünür, amma lent çəkilib.",c:[["Sahə sakit olduğu üçün qısa yolla keçmək",0,"Təhlükənin görünməməsi onun olmaması demək deyil."],["Girməmək, yaxındakıları xəbərdar etmək və qurumlara bildirmək",1,"Düzgün! Nişan rəsmi qadağandır."],["Yalnız lentin altından əyilib keçmək",0,"Qadağan zonaya daxil olmaq birbaşa risqdir."]]},
 {z:"Meşə zolağı",tp:"Partlamamış sursat",t:"Torpaqdan qismən çıxmış köhnə sursat qalığı",d:"Yağışdan sonra ağacların altında paslı silindrik bir cisim görünür.",c:[["Torpağı təmizləyib nə olduğuna baxmaq",0,"Partlamamış sursat toxunuşa həssas ola bilər."],["Yerində dayanmaq, ehtiyatla geri çəkilmək və məlumat vermək",1,"Düzgün! Heç vaxt yoxlama."],["Dostları çağırıb birlikdə baxmaq",0,"Toplanmaq risk altında olanların sayını artırır."]]},
 {z:"Kənd cığırı",tp:"Təhlükəsiz hərəkət",t:"İstifadəsiz cığır və tərk edilmiş tikili",d:"Əsas yoldan ayrılan cığır tərk edilmiş binaya aparır. Qısa yol kimi görünür.",c:[["Tikilinin içinə maraqdan girmək",0,"Nəzarətsiz sahələr gizli təhlükə daşıyır."],["Əsas və tanış yolda qalmaq",1,"Düzgün! Yalnız bilinən yollardan istifadə et."],["Sıx otluğun içindən keçmək",0,"Baxımsız zolaqlar əlavə risk yaradır."]]},
 {z:"Kənd girişi",tp:"İcmanı qorumaq",t:"Dostun tapdığı əşyanı götürmək istəyir",d:"Dostun yoldan kənarda bir əşya tapıb. “Gəl götürək, maraqlıdır!” deyir.",c:[["Onunla bir yerdə götürüb yoxlamaq",0,"Birlikdə risk etmək təhlükəni artırır."],["Dostuna toxunmamağı deyib birgə uzaqlaşmaq və böyüyə xəbər vermək",1,"Düzgün! Başqasını qorumaq da qərardır."],["Sadəcə baxıb heç kimə deməmək",0,"Məlumat verilməsə, başqası zərər görə bilər."]]}];
-const TOPICS=[["Mina nədir?","Torpağın üstündə və ya altında yerləşdirilən, təsir nəticəsində partlayan qurğudur."],["Partlamamış sursat","Müharibə və ya təlimlərdən qalmış, vaxtında partlamamış mərmi, qumbara və digər sursatlardır."],["Niyə təhlükəlidir?","Uzun illər keçsə də partlama qabiliyyətini saxlaya bilər."],["Xəbərdarlıq nişanları","Nişan və lent olan əraziyə girmək qəti qadağandır."],["Şübhəli əşya","Dayan, yaxınlaşma, toxunma, gəldiyin yolla uzaqlaş, məlumat ver."],["Uşaqları qorumaq","Uşaqlara naməlum əşyaya toxunmamağı öyrət, təhlükəli ərazidə oynatma."],["Hara zəng etməli?","102 (DİN), 112 (FHN), 805 (ANAMA)."]];
+const TOPICS=[["Mina nədir?","Torpağın üstündə və ya altında yerləşdirilən, təsir nəticəsində partlayan qurğudur."],["Partlamamış sursat","Müharibə və ya təlimlərdən qalmış, vaxtında partlamamış mərmi, qumbara və digər sursatlardır."],["Niyə təhlükəlidir?","Uzun illər keçsə də partlama qabiliyyətini saxlaya bilər."],["Xəbərdarlıq nişanları","Nişan və lent olan əraziyə girmək qəti qadağandır."],["Şübhəli əşya","Dayan, yaxınlaşma, toxunma, gəldiyin yolla uzaqlaş, məlumat ver."],["Uşaqları qorumaq","Uşaqlara naməlum əşyaya toxunmamağı öyrət, təhlükəli ərazidə oynatma."],["Hara zəng etməli?","102 (DİN), 112 (FHN)."]];
 const SAMPLE=[["Aysel M.",500],["Murad Ə.",380],["Leyla H.",260]];
 const $=id=>document.getElementById(id);
-let st={best:0,name:""};try{st={...st,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){}
+let st={best:0,name:"",mem:{},pre:null,post:null};try{st={...st,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
 const rank=c=>c>=5?"Təhlükəsizlik Eksperti":c>=3?"Tədqiqatçı":"Başlanğıc";
-function go(p){document.querySelectorAll(".pg").forEach(s=>s.classList.toggle("on",s.id===p));document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));scrollTo(0,0);if(p==="cert")sync()}
+function go(p){document.querySelectorAll(".pg").forEach(s=>s.classList.toggle("on",s.id===p));document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));scrollTo(0,0);if(p==="cert")sync();if(p==="mem")renderMem();if(p==="dash")renderDash()}
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.p));
 $("topics").innerHTML=TOPICS.map((x,i)=>`<div class="card"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join("");
 /* audio */
@@ -202,22 +267,22 @@ $("dZone").textContent=`${q.z} · ${q.tp}`;$("dT").textContent=q.t;$("dD").textC
 const ch=q.c.map((c,k)=>({c,k})).sort(()=>Math.random()-.5);
 $("dCh").innerHTML="";ch.forEach(o=>{const b=document.createElement("button");b.className="ch";b.textContent=o.c[0];b.onclick=()=>answer(o.c,b);$("dCh").appendChild(b)});
 $("ovDec").classList.add("on");dec=Date.now();const bar=$("dBar");
-clearInterval(tmr);tmr=setInterval(()=>{const left=Math.max(0,15-(Date.now()-dec)/1e3);bar.style.width=left/15*100+"%";if(left<=0){clearInterval(tmr);answer(["",0,"Vaxt bitdi. Real vəziyyətdə tərəddüd etmə: dayan, uzaqlaş, 102/112/805-ə zəng et."])}},100)}
+clearInterval(tmr);tmr=setInterval(()=>{const left=Math.max(0,15-(Date.now()-dec)/1e3);bar.style.width=left/15*100+"%";if(left<=0){clearInterval(tmr);answer(["",0,"Vaxt bitdi. Real vəziyyətdə tərəddüd etmə: dayan, uzaqlaş, 102/112-ə zəng et."])}},100)}
 function answer(c,btn){clearInterval(tmr);document.querySelectorAll(".ch").forEach(b=>b.disabled=true);
-const left=Math.max(0,15-(Date.now()-dec)/1e3),ok=c[1]===1;
+const left=Math.max(0,15-(Date.now()-dec)/1e3),ok=c[1]===1;track({kind:"answer",topic:L[G.i].tp,correct:ok});memRec(L[G.i].tp,ok);G.lw={tp:L[G.i].tp,t:c[0]};
 if(ok){G.combo++;const pts=100+Math.round(left*5)+G.combo*10;G.score+=pts;G.res[G.i]=1;G.cleared[G.i]=1;snd(660);setTimeout(()=>snd(880),120)}
 else{G.combo=0;G.lives--;G.res[G.i]=0;G.shake=18;G.flash=1;snd(140,.4,"sawtooth")}
 hud();
-$("dRes").innerHTML=`<div class="res ${ok?"ok":"no"}"><b>${ok?"Düzgün qərar!":"Təhlükəli seçim!"}</b><p style="color:inherit;margin-top:4px">${c[2]}</p>${ok?`<p style="color:inherit;margin-top:4px">📞 Məlumat verildi: 102 / 112 / 805. Ərazi qurumlara bildirildi.</p>`:""}<button class="btn b1" style="margin-top:12px" id="nx">Davam et</button></div>`;
+$("dRes").innerHTML=`<div class="res ${ok?"ok":"no"}"><b>${ok?"Düzgün qərar!":"Təhlükəli seçim!"}</b><p style="color:inherit;margin-top:4px">${c[2]}</p>${ok?`<p style="color:inherit;margin-top:4px">📞 Məlumat verildi: 102 / 112. Ərazi qurumlara bildirildi.</p>`:""}${ok?"":`<button class="btn b2" style="margin:12px 8px 0 0" onclick="coach()">SafeCoach AI izah etsin</button>`}<button class="btn b1" style="margin-top:12px" id="nx">Davam et</button><div id="coachBox" style="margin-top:10px;white-space:pre-line"></div></div>`;
 $("nx").onclick=()=>{$("ovDec").classList.remove("on");G.i++;if(G.lives<=0)return finish(false);G.s="walk"};$("nx").focus()}
 async function finish(win){G.s="over";const cor=G.res.filter(r=>r===1).length;
 const total=G.score+(win?G.lives*50:0);const stars=!cor?0:win?(G.lives===3?3:G.lives===2?2:1):1;
 if(total>st.best){st.best=total;st.rank=rank(cor);save()}
-$("endBox").innerHTML=`<div class="zone">${win?"MİSSİYA TAMAMLANDI":"MİSSİYA BAŞA ÇATDI"}</div><h2>${win?"Kəndə sağ-salamat çatdın":"Bu dəfə alınmadı, yenidən cəhd et"}</h2><div class="stars">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div><div class="stat"><span>${total} xal</span><span>${cor}/${L.length} düzgün</span><span>${rank(cor)}</span></div><div id="tips" style="color:var(--mu);font-size:.92rem">AI tövsiyə hazırlanır...</div><div class="row" style="margin-top:16px"><button class="btn b1" onclick="startGame()">Yenidən oyna</button><button class="btn b2" onclick="go('cert')">Sertifikat</button></div>`;
+$("endBox").innerHTML=`<div class="zone">${win?"MİSSİYA TAMAMLANDI":"MİSSİYA BAŞA ÇATDI"}</div><h2>${win?"Kəndə sağ-salamat çatdın":"Bu dəfə alınmadı, yenidən cəhd et"}</h2><div class="stars">${"★".repeat(stars)}${"☆".repeat(3-stars)}</div><div class="stat"><span>${total} xal</span><span>${cor}/${L.length} düzgün</span><span>${rank(cor)}</span></div><div id="tips" style="color:var(--mu);font-size:.92rem">AI tövsiyə hazırlanır...</div><div class="row" style="margin-top:16px"><button class="btn b1" onclick="startGame()">Yenidən oyna</button><button class="btn b2" onclick="quiz('post')">Son test (SafeImpact)</button><button class="btn b2" onclick="go('cert')">Sertifikat</button></div>`;
 $("ovEnd").classList.add("on");G.total=total;G.cor=cor;
 const wrong=L.filter((_,i)=>G.res[i]!==1).map(q=>q.tp);
 try{const r=await fetch(API+"/api/recommendations",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({score:total,totalQuestions:L.length,level:rank(cor),wrongTopics:wrong})});const d=await r.json();
-$("tips").innerHTML=`<p>${d.summary||""}</p><ul style="padding-left:18px;margin-top:6px">${(d.tips||[]).map(t=>`<li>${t}</li>`).join("")}</ul>`}catch(e){$("tips").textContent="Şübhəli əşyaya toxunma, uzaqlaş və 102 / 112 / 805 xəttinə zəng et."}}
+$("tips").innerHTML=`<p>${d.summary||""}</p><ul style="padding-left:18px;margin-top:6px">${(d.tips||[]).map(t=>`<li>${t}</li>`).join("")}</ul>`}catch(e){$("tips").textContent="Şübhəli əşyaya toxunma, uzaqlaş və 102 / 112 xəttinə zəng et."}}
 /* drawing */
 let cam=0,dust=[];
 const mix=(a,b,t)=>a.map((v,i)=>Math.round(v+(b[i]-v)*t)),rgb=c=>`rgb(${c})`;
@@ -274,16 +339,62 @@ if(G.i<L.length&&G.px>=tgt-1)openDec();else if(G.i>=L.length&&G.px>=END-1)finish
 let ln=0;for(let i=0;i<L.length;i++)if(G.cleared[i]&&Math.abs(G.px-hz(i))<150)ln=28;G.lane+=(ln-G.lane)*.1;
 cam=Math.max(0,G.px-320);draw();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
+/* SafePoint modules */
+const sidOf=()=>st.sid||(st.sid=Math.random().toString(36).slice(2)+Date.now().toString(36));
+let LOG=[];try{LOG=JSON.parse(localStorage.getItem(KEY+"_log")||"[]")}catch(e){}
+function track(e){const ev={sid:sidOf(),...e};LOG.push(ev);LOG=LOG.slice(-500);try{localStorage.setItem(KEY+"_log",JSON.stringify(LOG))}catch(_){}save();
+fetch(API+"/api/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ev),keepalive:true}).catch(()=>{})}
+const QZ={pre:[["Naməlum metal əşya görəndə ən təhlükəsiz addım hansıdır?",["Yaxınlaşıb baxmaq","Dayanıb uzaqlaşmaq və 102/112-ə bildirmək","Kənara təpikləmək"],1],["Xəbərdarlıq nişanı olan sahəyə münasibət necə olmalıdır?",["Tez keçmək","Girməmək","Yalnız kənarından getmək"],1],["Dostun təhlükəli görünən əşyanı götürmək istəsə nə etməlisən?",["Birlikdə götürmək","Toxunmamağı deyib uzaqlaşmaq və böyüyə xəbər vermək","Heç nə deməmək"],1]],
+post:[["Sursat qalığı görəndə ilk reaksiya necə olmalıdır?",["Torpağını təmizləmək","Hərəkət etmədən dayanıb ehtiyatla geri çəkilmək və bildirmək","Dostları çağırmaq"],1],["Hansı yollardan istifadə etmək daha təhlükəsizdir?",["Qısa yol cığırlar","Tanış və istifadə olunan yollar","Sıx otluq"],1],["Təhlükə barədə hansı nömrələrə zəng etmək olar?",["Yalnız sosial şəbəkə","102 və ya 112","Heç kimə"],1]]};
+function quiz(kind,next){const qs=QZ[kind],ov=$("ovQz");let sc=0,i=0;ov.classList.add("on");
+const step=()=>{if(i>=qs.length){const pct=Math.round(sc/qs.length*100);st[kind]=pct;save();track({kind,score:pct});ov.classList.remove("on");if(next)next();else go("dash");return}
+const q=qs[i],o=q[1].map((t,k)=>[t,k]).sort(()=>Math.random()-.5);
+ov.innerHTML=`<div class="pn"><div class="zone">${kind==="pre"?"BAŞLAMAZDAN ƏVVƏL":"SON TEST"} · ${i+1}/${qs.length}</div><h2>${q[0]}</h2>${o.map(x=>`<button class="ch" data-k="${x[1]}">${x[0]}</button>`).join("")}</div>`;
+ov.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{if(+b.dataset.k===q[2])sc++;i++;step()})};step()}
+function begin(){st.pre==null?quiz("pre",startGame):startGame()}
+async function coach(){const w=G.lw,b=$("coachBox");b.textContent="SafeCoach AI izah edir...";
+try{const r=await fetch(API+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`Simulyasiyada "${w.tp}" mövzusunda "${w.t||"cavab verə bilmədim"}" seçimini etdim. Niyə təhlükəlidir və düzgün davranış nədir? 3 qısa cümlə ilə izah et.`,messages:[]})});const d=await r.json();b.textContent=d.reply||d.error}
+catch(e){b.textContent="Server əlçatan deyil. Qayda: dayan, toxunma, uzaqlaş, 102/112."}}
+/* SafeMemory (Leitner) */
+const IV=[0,1,3,7].map(d=>d*864e5);
+function memRec(tp,ok){const m=st.mem[tp];if(!ok)st.mem[tp]={box:0,due:Date.now()};else if(m){m.box=Math.min(3,m.box+1);m.due=Date.now()+IV[m.box]}save()}
+function renderMem(){const el=$("memList"),ks=Object.keys(st.mem||{});
+el.innerHTML=ks.length?ks.map(tp=>{const m=st.mem[tp],due=m.due<=Date.now();return `<div class="card"><h3>${tp}</h3><p>${"●".repeat(m.box+1)}${"○".repeat(3-m.box)} · ${due?"Təkrar vaxtı gəlib":"Növbəti təkrar: "+new Date(m.due).toLocaleDateString("az-AZ")}</p>${due?`<button class="btn b1" style="margin-top:12px" data-tp="${tp}">Təkrarla</button>`:""}</div>`}).join(""):`<div class="card"><p>Hələ səhv yoxdur. SafeDecision-də səhv etdiyin mövzular burada avtomatik görünəcək.</p></div>`;
+el.querySelectorAll("button[data-tp]").forEach(b=>b.onclick=()=>review(b.dataset.tp))}
+function review(tp){const q=L.find(x=>x.tp===tp),box=$("memQ"),o=[...q.c].sort(()=>Math.random()-.5);
+box.innerHTML=`<div class="card"><div class="zone">TƏKRAR</div><h3>${q.t}</h3><p>${q.d}</p>${o.map((c,k)=>`<button class="ch" data-k="${k}">${c[0]}</button>`).join("")}<div id="memR"></div></div>`;
+box.querySelectorAll(".ch").forEach(b=>b.onclick=()=>{const c=o[+b.dataset.k],ok=c[1]===1;memRec(tp,ok);track({kind:"answer",topic:tp,correct:ok,src:"review"});
+$("memR").innerHTML=`<div class="res ${ok?"ok":"no"}"><b>${ok?"Düzgün! Növbəti təkrar uzadıldı.":"Yenə səhv. Mövzu yenidən növbəyə qayıtdı."}</b><p style="color:inherit;margin-top:4px">${c[2]}</p></div>`;box.querySelectorAll(".ch").forEach(x=>x.disabled=true);setTimeout(renderMem,1800)})}
+/* SafeImpact + SafeAnalytics */
+function aggr(ev){const t={},s=new Set(),pr=[],po=[],q={};ev.forEach(e=>{s.add(e.sid);if(e.kind==="answer"){const a=t[e.topic]=t[e.topic]||{attempts:0,wrong:0};a.attempts++;if(!e.correct)a.wrong++}else if(e.kind==="pre")pr.push(e.score);else if(e.kind==="post")po.push(e.score);else if(e.kind==="qr")q[e.src]=(q[e.src]||0)+1});
+const av=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;return{sessions:s.size,topics:Object.entries(t).map(([k,v])=>({topic:k,...v})),pre_avg:av(pr),post_avg:av(po),qr:q}}
+async function renderDash(){
+let d=null;try{d=await(await fetch(API+"/api/analytics")).json()}catch(e){}
+const local=!d||d.error;if(local)d=aggr(LOG);
+const tot=d.topics.reduce((x,t)=>x+t.attempts,0),wr=d.topics.reduce((x,t)=>x+t.wrong,0),acc=tot?Math.round((tot-wr)/tot*100):null;
+const dl=d.pre_avg!=null&&d.post_avg!=null?d.post_avg-d.pre_avg:null;
+const K=(ic,v,l,t)=>`<div class="kpi"><div class="ki">${ic}</div><div class="kv">${v}</div><div class="kl">${l}</div><div class="ks">${t}</div></div>`;
+$("kpis").innerHTML=K("👥",d.sessions||0,"İstifadəçi","anonim cihaz sayı")+K("🎯",acc==null?"—":acc+"%","Düzgün cavab","bütün qərarlar üzrə")+K("🧠",tot,"Verilən qərar","simulyasiya və təkrar")+K("🚀",dl==null?"—":(dl>=0?"+":"")+dl,"Orta artım (bənd)","testdən əvvəl və sonra");
+const rows=[...d.topics].sort((a,b)=>b.wrong/b.attempts-a.wrong/a.attempts);
+$("topicBars").innerHTML=rows.length?rows.map((r,i)=>{const p=Math.round(r.wrong/r.attempts*100),c=p>=50?"r":p>=25?"":"g",t=p>=50?"Çətin":p>=25?"Orta":"Yaxşı",tc=p>=50?"r":p>=25?"a":"g";
+return `<div class="brow"><div class="rk">${i+1}</div><div class="bn">${r.topic}<small>${r.wrong} səhv / ${r.attempts} cəhd</small></div><span class="tg ${tc}">${t} · ${p}%</span><div class="bar ${c}"><i style="width:${p}%"></i></div></div>`}).join(""):`<div class="empty"><b>📊</b>Hələ məlumat yoxdur.<br>SafeDecision-da bir neçə qərar ver, nəticələr burada görünəcək.</div>`;
+const imp=(t,a,b)=>`<div class="irow"><div class="it">${t}</div><div class="ib"><span>Əvvəl</span><div class="bar"><i style="width:${a||0}%"></i></div><b>${a==null?"—":a+"%"}</b></div><div class="ib"><span>Sonra</span><div class="bar g"><i style="width:${b||0}%"></i></div><b>${b==null?"—":b+"%"}</b></div>${a!=null&&b!=null?`<span class="delta ${b>=a?"up":"dn"}">${b>=a?"▲ +":"▼ "}${b-a} faiz bəndi</span>`:`<div class="hint" style="margin:6px 0 0">${a==null?"İlkin test oyundan əvvəl avtomatik çıxacaq.":"Oyunu bitirib “Son test” düyməsinə bas."}</div>`}</div>`;
+$("impact").innerHTML=imp("Sənin nəticən",st.pre,st.post)+imp("Bütün istifadəçilərin orta nəticəsi",d.pre_avg,d.post_avg);
+const w=rows[0];$("insight").innerHTML=`<h3>💡 Qısa nəticə</h3><p class="hint" style="margin:6px 0 0">${w?`Ən çətin mövzu <b style="color:var(--tx)">“${w.topic}”</b>dir: cəhdlərin ${Math.round(w.wrong/w.attempts*100)}%-i səhv olub. Belə mövzular SafeMemory ilə tez-tez təkrarlanmalı, təlimdə daha çox vurğulanmalıdır.`:"Məlumat toplandıqca burada avtomatik nəticə yazılacaq."}${local?" (Server əlçatan deyil, yalnız bu cihazın məlumatı göstərilir.)":""}</p>`}
 /* chat */
 function bub(r,t){const d=document.createElement("div");d.className="bb "+r;d.textContent=t;$("chat").appendChild(d);$("chat").scrollTop=1e9}
 let hist=[];async function sendChat(){const v=$("ci").value.trim();if(!v)return;$("ci").value="";bub("u",v);
 try{const r=await fetch(API+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:v,messages:hist})});const d=await r.json();const a=d.reply||d.error||"Cavab alınmadı.";hist.push({role:"user",content:v},{role:"assistant",content:a});bub("b",a)}
-catch(e){bub("b","Serverlə əlaqə yoxdur. Təhlükə halında uzaqlaş və 102, 112 və ya 805-ə zəng et.")}}
+catch(e){bub("b","Serverlə əlaqə yoxdur. Təhlükə halında uzaqlaş və 102 və ya 112-ə zəng et.")}}
 /* cert */
 function sync(){$("cD").textContent=new Date().toLocaleDateString("az-AZ");const sc=G.total||st.best||0,rk=G.total?rank(G.cor):(st.rank||"Başlanğıc");$("cS").textContent=sc;$("cI").textContent="MS-"+(10000+(sc*7919+(st.name||"x").length*104729)%89999);$("cR").textContent=rk;if(st.name){$("cN").textContent=st.name;$("nm").value=st.name}
 const rows=[...SAMPLE.map(r=>[r[0],r[1]>=450?"Təhlükəsizlik Eksperti":"Tədqiqatçı",r[1]]),[(st.name||"Sən")+" (Sən)",rk,sc]].sort((a,b)=>b[2]-a[2]);
 $("lb").innerHTML=rows.map(r=>`<tr><td>${r[0].replace(/</g,"&lt;")}</td><td>${r[1]}</td><td><b>${r[2]}</b></td></tr>`).join("")}
 function mkCert(){st.name=$("nm").value.trim()||"İştirakçı";save();sync()}
+addEventListener("scroll",()=>$("hd").classList.toggle("sc",scrollY>10),{passive:true});
+function cnt(el){const to=+el.dataset.count,sf=el.dataset.suf||"";let t0=null;const f=t=>{t0=t0||t;const p=Math.min(1,(t-t0)/1300);el.textContent=Math.round(to*(1-Math.pow(1-p,3)))+sf;if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");if(e.target.dataset.count)cnt(e.target);io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll(".reveal,[data-count]").forEach(el=>io.observe(el));
 sync();
 </script>
 </body>
