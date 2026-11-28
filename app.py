@@ -25,7 +25,7 @@ SYSTEM_PROMPT = (
     "Qayda: heç vaxt mina aşkarladığını, ərazinin təhlükəsiz olduğunu və ya əşyanın zərərsiz olduğunu demə; "
     "heç vaxt yoxlama, toxunma və ya zərərsizləşdirmə təlimatı vermə. "
     "Şübhəli əşya və ya real təhlükə halında: dayan, yaxınlaşma, toxunma, təhlükəsiz yolla uzaqlaş "
-    "və 102 və ya 112 qaynar xətlərinə məlumat ver. "
+    "və 805 (ANAMA qaynar xətti), 102 (Polis) və ya 112 (FHN) qaynar xətlərinə məlumat ver. "
     "Simulyasiyada səhv seçim izah edilərkən səbəbi qısa və mehriban izah et, düzgün davranışı de. "
     "Yalnız Azərbaycan dilində, ulduz (`**`) işarəsi olmadan, səliqəli sətir və siyahılarla cavab ver."
 )
@@ -134,7 +134,7 @@ def recommendations():
             "tips": [
                 "Tanımadığınız və şübhəli əşyalara toxunmayın və yaxınlaşmayın.",
                 "Təhlükəli əlamət görəndə gəldiyiniz yolla təhlükəsiz məsafəyə uzaqlaşın.",
-                "Dərhal 102 və ya 112 qaynar xətlərinə məlumat verin.",
+                "Dərhal 805 (ANAMA), 102 (Polis) və ya 112 (FHN) qaynar xətlərinə məlumat verin.",
             ],
         })
 
